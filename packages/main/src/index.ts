@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { HTTP_PORT, ALLOWED_ORIGINS } from './config';
+import fourOFour from './routes/404';
 
 const app = express();
 app.use(
@@ -14,6 +15,7 @@ app.use(
 );
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(fourOFour);
 
 app.listen(HTTP_PORT, () => {
   console.log(`App started on: ${HTTP_PORT}`);
