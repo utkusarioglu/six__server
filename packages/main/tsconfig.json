@@ -5,10 +5,12 @@
     "composite": true,
     "outDir": "lib"
   },
-  "include": ["src"],
   "references": [
     {
       "path": "../store/"
+    },
+    {
+      "path": "../auth"
     }
   ]
 }
