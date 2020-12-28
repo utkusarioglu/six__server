@@ -1,0 +1,5 @@
+{
+  "watch": ["packages"],
+  "ext": "js",
+  "exec": "node ./packages/main/lib/index.js"
+}
