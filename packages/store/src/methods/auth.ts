@@ -26,8 +26,13 @@ async function loginWithUsernameAndPassword(
  * @param user user map defined by {@link User}
  */
 async function serializeUser(user: User) {
-  serialStore[user.id] = user;
-  return Promise.resolve(user.id);
+  await postgres('sessions')
+    .insert<Session>({
+      username: user.username,
+      user_id: user.id,
+    })
+    .catch(console.error);
+  return user.id;
 }
 
 /**
@@ -36,7 +41,16 @@ async function serializeUser(user: User) {
  * @param id user.id from {@link User}
  */
 async function deserializeUser(id: string) {
-  return Promise.resolve(serialStore[id]);
+  return await postgres('sessions')
+    .where({ user_id: id })
+    .then((sessions) => {
+      if (sessions.length === 1) {
+        return sessions[0];
+      } else {
+        return false;
+      }
+    })
+    .catch(console.error);
 }
 
 /**
@@ -120,6 +134,18 @@ async function clearSessions(): Promise<void> {
   return postgres('sessions').del();
 }
 
+/**
+ * Removes session with the given id from the sessions table
+ * @param user_id id for the session to be removed
+ */
+async function removeSession(user: any): Promise<void> {
+  console.log('user', user);
+  await postgres('sessions')
+    .where({ user_id: user.user_id })
+    .del()
+    .catch(console.error);
+}
+
 export default {
   loginWithUsernameAndPassword,
   serializeUser,
@@ -129,10 +155,16 @@ export default {
   clearUsers,
   createSessions,
   clearSessions,
+  removeSession,
 };
 
 export interface DbUser {
   username: string;
   password: string;
   age: number;
+}
+
+export interface Session {
+  username: string;
+  user_id: string;
 }

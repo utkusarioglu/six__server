@@ -85,8 +85,9 @@ export function useAuth(app: Express) {
     })(req, res, next);
   });
 
-  app.post('/api/logout', (req, res, next) => {
+  app.post('/api/logout', async (req, _res, next) => {
     if (req.user) {
+      await store.auth.removeSession(req.user);
       req.logout();
       next('logged out');
     } else {
