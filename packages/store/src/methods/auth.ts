@@ -49,7 +49,7 @@ async function initUsers() {
     postgres.schema
       .createTableIfNotExists('users', (table) => {
         table.increments('id');
-        table.string('name');
+        table.string('username');
         // TODO create a custom domain for this if in production
         table.string('password');
         table.integer('age');
@@ -134,7 +134,7 @@ export default {
 };
 
 export interface DbUser {
-  name: string;
+  username: string;
   password: string;
   age: number;
 }
