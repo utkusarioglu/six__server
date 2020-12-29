@@ -1,4 +1,4 @@
-import knex from '../connectors/knex';
+import postgres from '../connectors/knex';
 import type { User } from 'six__server__auth/src/@types/user';
 
 /**
@@ -42,7 +42,7 @@ async function deserializeUser(id: string) {
  */
 async function createUsersTableIfNotExist() {
   return (
-    knex.schema
+    postgres.schema
       .createTableIfNotExists('users', (table) => {
         table.increments('id');
         table.string('name');
@@ -61,7 +61,7 @@ async function createUsersTableIfNotExist() {
  * @param users users array
  */
 async function insertUsers(users: DbUser[]) {
-  return knex('users').insert(users).then(console.log).catch(console.log);
+  return postgres('users').insert(users).then(console.log).catch(console.log);
 }
 
 const serialStore: { [id: string]: User } = {};
