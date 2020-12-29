@@ -1,19 +1,10 @@
 import auth from './methods/auth';
+import { init, mockUsers } from './sets/init';
 
 const store = {
   auth,
 };
 
-store.auth
-  .initUsers()
-  .then(() => store.auth.clearUsers())
-  .then(() => {
-    store.auth.insertUsers([
-      {
-        name: 'utku',
-        password: 'utku',
-        age: 3,
-      },
-    ]);
-  });
+init(store).then(() => mockUsers(store));
+
 export default store;
