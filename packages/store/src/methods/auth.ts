@@ -6,7 +6,10 @@ import type { User } from 'six__server__auth/src/@types/user';
  * @param username
  * @param password
  */
-async function withUsernameAndPassword(username: string, password: string) {
+async function loginWithUsernameAndPassword(
+  username: string,
+  password: string
+) {
   if (username === 'utku' && password === '1') {
     return {
       id: 'utku',
@@ -67,7 +70,7 @@ async function insertUsers(users: DbUser[]) {
 const serialStore: { [id: string]: User } = {};
 
 export default {
-  withUsernameAndPassword,
+  loginWithUsernameAndPassword,
   serializeUser,
   deserializeUser,
   createUsersTableIfNotExist,

@@ -16,7 +16,7 @@ Passport.use(
     },
     async (username, password, done) => {
       try {
-        const user = await store.auth.withUsernameAndPassword(
+        const user = await store.auth.loginWithUsernameAndPassword(
           username,
           password
         );
