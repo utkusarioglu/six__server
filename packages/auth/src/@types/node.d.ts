@@ -1,7 +1,7 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      NODE_SESSION_SECRET: string;
+      SERVER_SESSION_SECRET: string;
     }
   }
 }
