@@ -1,4 +1,4 @@
-const { POSTGRES_PASSWORD, POSTGRES_USER, POSTGRES_DB } = process.env;
+const { POSTGRES_PASSWORD, POSTGRES_USER, POSTGRES_DB, NODE_ENV } = process.env;
 
 if (!POSTGRES_PASSWORD)
   throw new Error('.env/POSTGRES_PASSWORD is required by server store');
@@ -9,6 +9,9 @@ if (!POSTGRES_USER)
 if (!POSTGRES_DB)
   throw new Error('.env/POSTGRES_DB is required by server store');
 
+if (!NODE_ENV) throw new Error('.env/NODE_ENV is required by server store');
+
 export const PG_PASSWORD = POSTGRES_PASSWORD;
 export const PG_USER = POSTGRES_USER;
 export const PG_DB = POSTGRES_DB;
+export const ENV = NODE_ENV;
