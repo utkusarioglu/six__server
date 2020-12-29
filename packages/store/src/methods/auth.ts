@@ -11,14 +11,12 @@ async function loginWithUsernameAndPassword(
   username: string,
   password: string
 ) {
-  if (username === 'utku' && password === '1') {
-    return {
-      id: 'utku',
-      name: 'utku',
-      motto: 'omg is this real?',
-    };
+  const users = await postgres('users').where({ username, password });
+
+  if (users.length === 1) {
+    return users[0];
   } else {
-    false;
+    return false;
   }
 }
 
