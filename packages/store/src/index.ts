@@ -4,13 +4,16 @@ const store = {
   auth,
 };
 
-store.auth.createUsersTableIfNotExist().then(() => {
-  store.auth.insertUsers([
-    {
-      name: 'utku',
-      password: 'utku',
-      age: 3,
-    },
-  ]);
-});
+store.auth
+  .initUsers()
+  .then(() => store.auth.clearUsers())
+  .then(() => {
+    store.auth.insertUsers([
+      {
+        name: 'utku',
+        password: 'utku',
+        age: 3,
+      },
+    ]);
+  });
 export default store;

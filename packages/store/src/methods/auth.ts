@@ -44,13 +44,13 @@ async function deserializeUser(id: string) {
 /**
  * Creates the users table
  */
-async function createUsersTableIfNotExist() {
+async function initUsers() {
   return (
     postgres.schema
       .createTableIfNotExists('users', (table) => {
         table.increments('id');
         table.string('name');
-        // !create a custom domain for this if in production
+        // TODO create a custom domain for this if in production
         table.string('password');
         table.integer('age');
       })
@@ -84,7 +84,10 @@ async function clearUsers() {
  * @param users users array
  */
 async function insertUsers(users: DbUser[]) {
-  return postgres('users').insert(users).then(console.log).catch(console.log);
+  return postgres('users')
+    .insert(users)
+    .then(() => console.log('users inserted'))
+    .catch(console.log);
 }
 
 const serialStore: { [id: string]: User } = {};
@@ -93,8 +96,9 @@ export default {
   loginWithUsernameAndPassword,
   serializeUser,
   deserializeUser,
-  createUsersTableIfNotExist,
+  initUsers,
   insertUsers,
+  clearUsers,
 };
 
 export interface DbUser {
