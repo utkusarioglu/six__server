@@ -26,5 +26,3 @@ app.use(fourOFour);
 app.listen(HTTP_PORT, () => {
   console.log(`App started on: ${HTTP_PORT}`);
 });
-
-console.log(process.env);
