@@ -16,7 +16,7 @@ Passport.use(
     },
     async (username, password, done) => {
       try {
-        const user = await store.login.withUsernameAndPassword(
+        const user = await store.auth.withUsernameAndPassword(
           username,
           password
         );
@@ -35,7 +35,7 @@ Passport.use(
 Passport.serializeUser(async (user, done) => {
   try {
     // @ts-ignore
-    const serializedId = await store.login.serializeUser(user);
+    const serializedId = await store.auth.serializeUser(user);
     done(null, serializedId);
   } catch (e) {
     done(e);
@@ -45,7 +45,7 @@ Passport.serializeUser(async (user, done) => {
 Passport.deserializeUser(async (id, done) => {
   try {
     // @ts-ignore
-    const user = await store.login.deserializeUser(id);
+    const user = await store.auth.deserializeUser(id);
     if (user) {
       done(null, user);
     } else {
