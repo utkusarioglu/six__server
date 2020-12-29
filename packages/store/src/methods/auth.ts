@@ -90,7 +90,37 @@ async function insertUsers(users: DbUser[]) {
     .catch(console.log);
 }
 
-const serialStore: { [id: string]: User } = {};
+/**
+ * Creates sessions table in postgres if it doesn't already exist
+ */
+async function createSessions() {
+  return (
+    postgres.schema
+      .createTableIfNotExists('sessions', (table) => {
+        table.increments('id');
+        table.string('username');
+        table.string('user_id');
+        table.timestamp('created_at').defaultTo(postgres.fn.now());
+      })
+      .then(() => console.log('sessions table created'))
+      // TODO graceful error handling
+      .catch(console.log)
+  );
+}
+
+/**
+ * Clears sessions table
+ * Because of its volatile behavior, shall not work in production.
+ * Current implementation puts a console.error and then returns without
+ * clearing the table.
+ */
+async function clearSessions(): Promise<void> {
+  if (ENV === 'production') {
+    console.error('store.auth.clearSessions called in production, quitting');
+    return Promise.resolve();
+  }
+  return postgres('sessions').del();
+}
 
 export default {
   loginWithUsernameAndPassword,
@@ -99,6 +129,8 @@ export default {
   initUsers,
   insertUsers,
   clearUsers,
+  createSessions,
+  clearSessions,
 };
 
 export interface DbUser {
