@@ -1,6 +1,3 @@
-require('dotenv').config({
-  path: require('path').join(__dirname, '../../../.env'),
-});
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -29,3 +26,5 @@ app.use(fourOFour);
 app.listen(HTTP_PORT, () => {
   console.log(`App started on: ${HTTP_PORT}`);
 });
+
+console.log(process.env);
