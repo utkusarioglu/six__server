@@ -1,4 +1,5 @@
 import postgres from '../connectors/knex';
+import { ENV } from '../config';
 import type { User } from 'six__server__auth/src/@types/user';
 
 /**
@@ -57,6 +58,25 @@ async function createUsersTableIfNotExist() {
       // TODO graceful error handling
       .catch(console.log)
   );
+}
+
+/**
+ * Clears all the entries in Users table
+ * This method is useful for development and testing environment
+ * Due to its volatile behavior, the method is set to quit if called
+ * in production
+ */
+async function clearUsers() {
+  if (ENV === 'production') {
+    console.warn(
+      'store.auth.clearUsersTable was called while in production, ignoring'
+    );
+    return Promise.resolve();
+  }
+  return postgres('users')
+    .del()
+    .then(() => console.log('users table cleared'))
+    .catch(console.error);
 }
 
 /**
