@@ -94,6 +94,10 @@ export function useAuth(app: Express) {
       next("wasn't logged in");
     }
   });
+
+  app.post('/api/signup', async (req, _res, next) => {
+    // TODO
+  });
 }
 
 export function checkAuth(req: Request, res: Response, next: NextFunction) {
