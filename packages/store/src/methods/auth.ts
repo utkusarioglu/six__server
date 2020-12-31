@@ -21,6 +21,21 @@ async function loginWithUsernameAndPassword(
 }
 
 /**
+ * Returns the user row from the users table that has the given usernameField
+ * @param username username string
+ * @returns false if there is no match, also false if there are somehow more
+ * than one matches. It returns the user {@link User} if there is only one match
+ */
+async function getUserByUsername(username: string): Promise<User | false> {
+  const user = await postgres('users').where({ username });
+  if (user.length !== 1) {
+    return Promise.resolve(false);
+  } else {
+    return user[0];
+  }
+}
+
+/**
  * Serializes the session info to database. Used by passport to serialize
  * user information for the session
  * @param user user map defined by {@link User}
@@ -156,6 +171,7 @@ export default {
   createSessions,
   clearSessions,
   removeSession,
+  getUserByUsername,
 };
 
 export interface DbUser {
