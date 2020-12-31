@@ -3,6 +3,7 @@ import passportLocal from 'passport-local';
 import expressSession from 'express-session';
 import store from 'six__server__store';
 import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 import {
   usernameLengthValid,
   passwordLengthValid,
@@ -73,6 +74,9 @@ export function useAuth(app: Express) {
   app.use(
     expressSession({
       secret: SESSION_SECRET,
+      genid: (_req) => {
+        return uuidv4();
+      },
     })
   );
   app.use(Passport.initialize());
