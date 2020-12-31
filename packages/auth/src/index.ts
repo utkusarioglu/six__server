@@ -78,6 +78,8 @@ export function useAuth(app: Express) {
   app.use(
     expressSession({
       secret: SESSION_SECRET,
+      resave: true,
+      saveUninitialized: true,
       genid: (_req) => {
         return uuidv4();
       },
