@@ -10,7 +10,7 @@ export async function mockUsers(store: typeof Store): Promise<void> {
   return await store.auth.insertUsers([
     {
       username: 'utku',
-      password: '1',
+      password: '$2b$10$P8C2Ul/ONsXO93qn4be5WOcfbCW7bby3dE6roKnWZhMcZ6q9etQsu',
       age: 3,
     },
   ]);

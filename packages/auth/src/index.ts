@@ -2,6 +2,11 @@ import Passport from 'passport';
 import passportLocal from 'passport-local';
 import expressSession from 'express-session';
 import store from 'six__server__store';
+import bcrypt from 'bcrypt';
+import {
+  usernameLengthValid,
+  passwordLengthValid,
+} from './validation/validation';
 import { SESSION_SECRET } from './config';
 import type { Express, Request, Response, NextFunction } from 'express';
 
@@ -15,19 +20,27 @@ Passport.use(
       passwordField: 'password',
     },
     async (username, password, done) => {
-      try {
-        const user = await store.auth.loginWithUsernameAndPassword(
-          username,
-          password
-        );
-        if (user) {
-          done(null, user);
-        } else {
-          done(null, false);
-        }
-      } catch (e) {
-        done(e);
+      if (!usernameLengthValid(username)) {
+        return done({ error: 'username not within length params' });
       }
+
+      if (!passwordLengthValid(password)) {
+        return done({ error: 'pass not within length params' });
+      }
+
+      store.auth.getUserByUsername(username).then((user) => {
+        if (!user) {
+          return done(null, false);
+        }
+
+        bcrypt.compare(password, user.password).then((result) => {
+          console.log({ user, password, result });
+          if (!result) {
+            return done(null, false);
+          }
+          return done(null, user);
+        });
+      });
     }
   )
 );
