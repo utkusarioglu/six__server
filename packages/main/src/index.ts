@@ -5,6 +5,7 @@ import { HTTP_PORT, ALLOWED_ORIGINS } from './config';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { useAuth, checkAuth } from 'six__server__auth';
+import { mockUsers } from 'six__server__mock-data';
 import insecure from './routes/insecure';
 import secure from './routes/secure';
 import fourOFour from './routes/404';
@@ -30,3 +31,5 @@ app.use(fourOFour);
 app.listen(HTTP_PORT, () => {
   console.log(`App started on: ${HTTP_PORT}`);
 });
+
+mockUsers();
