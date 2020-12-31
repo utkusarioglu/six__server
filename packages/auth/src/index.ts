@@ -56,10 +56,10 @@ Passport.serializeUser(async (user, done) => {
   }
 });
 
-Passport.deserializeUser(async (id, done) => {
+Passport.deserializeUser(async (user_id, done) => {
   try {
     // @ts-ignore
-    const user = await store.auth.deserializeUser(id);
+    const user = await store.auth.deserializeUser(user_id);
     if (user) {
       done(null, user);
     } else {

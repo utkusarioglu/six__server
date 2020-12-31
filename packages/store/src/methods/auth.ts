@@ -44,20 +44,20 @@ async function serializeUser(user: User) {
   await postgres('sessions')
     .insert<SessionModel>({
       username: user.username,
-      user_id: user.id,
+      user_id: user.user_id,
     })
     .catch(console.error);
-  return user.id;
+  return user.user_id;
 }
 
 /**
  * Returns the user info for the id given. Used by passport to
  * deserialize the session
- * @param id user.id from {@link User}
+ * @param user_id user.id from {@link User}
  */
-async function deserializeUser(id: string) {
+async function deserializeUser(user_id: string) {
   return await postgres('sessions')
-    .where({ user_id: id })
+    .where({ user_id })
     .then((sessions) => {
       if (sessions.length === 1) {
         return sessions[0];
@@ -76,9 +76,11 @@ async function initUsers() {
     postgres.schema
       .createTableIfNotExists('users', (table) => {
         table.increments('id');
+        table.string('user_id');
         table.string('username');
         // TODO create a custom domain for this if in production
         table.string('password');
+        table.string('email');
         table.integer('age');
       })
       .then(() => console.log('Users table created'))
@@ -175,8 +177,10 @@ export default {
 };
 
 export interface UserModel {
+  user_id: string;
   username: string;
   password: string;
+  email: string;
   age: number;
 }
 
