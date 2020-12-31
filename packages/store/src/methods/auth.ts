@@ -126,6 +126,17 @@ async function insertUsers(users: UserModel[]) {
 }
 
 /**
+ * Inserts the given user information to the database
+ * @param user user object
+ */
+async function insertUser(user: UserModel) {
+  return postgres('users')
+    .insert(user)
+    .then(() => console.log('user inserted', user))
+    .catch(console.error);
+}
+
+/**
  * Creates sessions table in postgres if it doesn't already exist
  */
 async function createSessions() {
@@ -168,7 +179,6 @@ async function clearSessions(): Promise<void> {
  * @param user_id id for the session to be removed
  */
 async function removeSession(user: any): Promise<void> {
-  console.log('user', user);
   await postgres('sessions')
     .where({ user_id: user.user_id })
     .del()
@@ -186,6 +196,7 @@ export default {
   clearSessions,
   removeSession,
   getUserByUsername,
+  insertUser,
 };
 
 export interface UserModel {
