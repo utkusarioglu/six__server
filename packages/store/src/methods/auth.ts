@@ -42,7 +42,7 @@ async function getUserByUsername(username: string): Promise<User | false> {
  */
 async function serializeUser(user: User) {
   await postgres('sessions')
-    .insert<Session>({
+    .insert<SessionModel>({
       username: user.username,
       user_id: user.id,
     })
@@ -180,7 +180,7 @@ export interface DbUser {
   age: number;
 }
 
-export interface Session {
+export interface SessionModel {
   username: string;
   user_id: string;
 }
