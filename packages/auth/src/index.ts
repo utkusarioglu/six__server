@@ -7,9 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   usernameLengthValid,
   passwordLengthValid,
+  passwordStrengthAcceptable,
+  isValidEmail,
+  isValidAge,
 } from './validation/validation';
 import { SESSION_SECRET } from './config';
 import type { Express, Request, Response, NextFunction } from 'express';
+import type { UserModel } from '../../store/src/methods/auth';
 
 const LocalStrategy = passportLocal.Strategy;
 
@@ -112,8 +116,61 @@ export function useAuth(app: Express) {
     }
   });
 
-  app.post('/api/signup', async (req, _res, next) => {
-    // TODO
+  app.post('/api/signup', async (req, res, next) => {
+    const { username, password, email, age } = req.body;
+
+    if (!usernameLengthValid(username)) {
+      return res.json({ error: 'username length boo' });
+    }
+
+    if (!passwordLengthValid(password)) {
+      return res.json({ error: 'password length boo' });
+    }
+
+    if (!passwordStrengthAcceptable(password)) {
+      return res.json({ error: 'password weak' });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.json({ error: 'email not valid' });
+    }
+
+    if (!isValidAge(age)) {
+      return res.json({ error: 'ageist' });
+    }
+
+    store.auth
+      .getUserByUsername(username)
+      .then(async (user) => {
+        if (user === false) {
+          bcrypt
+            .hash(password, 10)
+            .then((passwordHashed) => {
+              const userModel: UserModel = {
+                user_id: uuidv4(),
+                username,
+                password: passwordHashed,
+                email,
+                age,
+              };
+              store.auth.insertUser(userModel).then(() => {
+                console.log('user inserted');
+                req.login(userModel, (err) => {
+                  if (err) {
+                    return next(err);
+                  }
+
+                  return res.json({ message: 'logged in' });
+                });
+              });
+            })
+            // hash fail
+            .catch(console.error);
+        } else {
+          return res.json({ error: 'user with username already exists' });
+        }
+      })
+      .catch(console.error);
   });
 }
 
@@ -126,3 +183,13 @@ export function checkAuth(req: Request, res: Response, next: NextFunction) {
 }
 
 export const passport = Passport;
+
+/**
+ * Data that is expected from the user for the sign up
+ */
+interface SignupUserSupplied {
+  username: string;
+  password: string;
+  email: string;
+  age: number;
+}
