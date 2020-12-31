@@ -72,9 +72,15 @@ async function deserializeUser(user_id: string) {
  * Creates the users table
  */
 async function initUsers() {
+  const hasTable = await postgres.schema.hasTable('users');
+
+  if (hasTable) {
+    return;
+  }
+
   return (
     postgres.schema
-      .createTableIfNotExists('users', (table) => {
+      .createTable('users', (table) => {
         table.increments('id');
         table.string('user_id');
         table.string('username');
@@ -123,6 +129,12 @@ async function insertUsers(users: UserModel[]) {
  * Creates sessions table in postgres if it doesn't already exist
  */
 async function createSessions() {
+  const hasTable = await postgres.schema.hasTable('sessions');
+
+  if (hasTable) {
+    return;
+  }
+
   return (
     postgres.schema
       .createTableIfNotExists('sessions', (table) => {
@@ -133,7 +145,7 @@ async function createSessions() {
       })
       .then(() => console.log('sessions table created'))
       // TODO graceful error handling
-      .catch(console.log)
+      .catch(console.error)
   );
 }
 
