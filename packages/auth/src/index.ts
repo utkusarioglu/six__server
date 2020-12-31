@@ -108,9 +108,14 @@ export function useAuth(app: Express) {
 
   app.post('/api/logout', async (req, _res, next) => {
     if (req.user) {
-      await store.auth.removeSession(req.user);
-      req.logout();
-      next('logged out');
+      await store.auth
+        .removeSession(req.user)
+        .then(() => {
+          req.logout();
+          next('logged out');
+        })
+        // store session removal fail
+        .catch(console.error);
     } else {
       next("wasn't logged in");
     }
