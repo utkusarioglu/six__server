@@ -110,7 +110,7 @@ async function clearUsers() {
  * Inserts a set of users
  * @param users users array
  */
-async function insertUsers(users: DbUser[]) {
+async function insertUsers(users: UserModel[]) {
   return postgres('users')
     .insert(users)
     .then(() => console.log('users inserted'))
@@ -174,7 +174,7 @@ export default {
   getUserByUsername,
 };
 
-export interface DbUser {
+export interface UserModel {
   username: string;
   password: string;
   age: number;
