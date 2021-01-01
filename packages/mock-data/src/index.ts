@@ -1,6 +1,5 @@
 import store from 'six__server__store';
 
-// !ANY
 export async function mockUsers(): Promise<void> {
   await store.auth.clearUsers();
   return await store.auth.insertUsers([
