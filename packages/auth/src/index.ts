@@ -50,33 +50,11 @@ Passport.use(
   )
 );
 
-Passport.serializeUser(async (user, done) => {
-  try {
-    // @ts-ignore
-    const serializedId = await store.auth.serializeUser(user);
-    done(null, serializedId);
-  } catch (e) {
-    done(e);
-  }
-});
-
-Passport.deserializeUser(async (user_id, done) => {
-  try {
-    // @ts-ignore
-    const user = await store.auth.deserializeUser(user_id);
-    if (user) {
-      done(null, user);
-    } else {
-      done(false);
-    }
-  } catch (e) {
-    done(e);
-  }
-});
-
 export function useAuth(app: Express) {
+  // app.set('trust_proxy', 1);
   app.use(
     expressSession({
+      proxy: true,
       secret: SESSION_SECRET,
       resave: true,
       saveUninitialized: true,

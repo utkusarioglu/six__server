@@ -36,6 +36,7 @@ async function getUserByUsername(username: string): Promise<User | false> {
 }
 
 /**
+ * @deprecated
  * Serializes the session info to database. Used by passport to serialize
  * user information for the session
  * @param user user map defined by {@link User}
@@ -51,6 +52,7 @@ async function serializeUser(user: User) {
 }
 
 /**
+ * @deprecated
  * Returns the user info for the id given. Used by passport to
  * deserialize the session
  * @param user_id user.id from {@link User}
