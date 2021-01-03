@@ -4,13 +4,13 @@ const {
   NODE_ENV: NODE_APP_ENV,
 } = process.env;
 
-if (!SERVER_HTTP_PORT)
-  throw new Error('.env/SERVER_HTTP_PORT is a required by main package');
+const isRequired = ((packageName: string) => (variableName: string) =>
+  `.env/${variableName} is required by ${packageName}`)('server__main');
 
+if (!SERVER_HTTP_PORT) throw new Error(isRequired('SERVER_HTTP_PORT'));
+if (!NODE_APP_ENV) throw new Error(isRequired('NODE_APP_ENV'));
 if (!SERVER_ALLOWED_ORIGINS)
-  throw new Error('.env/SERVER_ALLOWED_ORIGINS is required by main package');
-
-if (!NODE_APP_ENV) throw new Error('.env/NODE_ENV is required by server store');
+  throw new Error(isRequired('SERVER_ALLOWED_ORIGINS'));
 
 export const HTTP_PORT = SERVER_HTTP_PORT;
 export const ALLOWED_ORIGINS = SERVER_ALLOWED_ORIGINS.split(',');
