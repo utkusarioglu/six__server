@@ -1,6 +1,6 @@
 import store from 'six__server__store';
 
-export async function mockUsers(): Promise<void> {
+async function mockUsers(): Promise<void> {
   await store.auth.clearUsers();
   return await store.auth.insertUsers([
     {
@@ -11,4 +11,14 @@ export async function mockUsers(): Promise<void> {
       age: 36,
     },
   ]);
+}
+
+/**
+ * Creates mock data for development purposes.
+ *
+ * @privateRemarks
+ * This function should not be called in production
+ */
+export async function createMockData(): Promise<void> {
+  return await mockUsers();
 }
