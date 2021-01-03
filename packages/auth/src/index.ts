@@ -83,6 +83,9 @@ export function useAuth(app: Express) {
       genid: (_req) => {
         return uuidv4();
       },
+      cookie: {
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+      },
     })
   );
   app.use(Passport.initialize());
