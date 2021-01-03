@@ -11,7 +11,7 @@ import {
   isValidEmail,
   isValidAge,
 } from './validation/validation';
-import { SESSION_SECRET } from './config';
+import { SESSION_SECRET, SECURE_SCHEMES } from './config';
 import type { Express, Request, Response, NextFunction } from 'express';
 import type { UserModel } from '../../store/src/methods/auth';
 
@@ -85,7 +85,7 @@ export function useAuth(app: Express) {
       },
       cookie: {
         maxAge: 365 * 24 * 60 * 60 * 1000,
-        secure: true,
+        secure: SECURE_SCHEMES,
       },
       store: store.sessionConnector(expressSession),
     })
