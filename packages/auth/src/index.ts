@@ -85,7 +85,9 @@ export function useAuth(app: Express) {
       },
       cookie: {
         maxAge: 365 * 24 * 60 * 60 * 1000,
+        secure: true,
       },
+      store: store.sessionConnector(expressSession),
     })
   );
   app.use(Passport.initialize());
