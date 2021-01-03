@@ -1,5 +1,5 @@
 import postgres from '../connectors/knex';
-import { ENV } from '../config';
+import { NODE_ENV } from '../config';
 import type { User } from 'six__server__auth/src/@types/user';
 
 /**
@@ -102,7 +102,7 @@ async function initUsers() {
  * in production
  */
 async function clearUsers() {
-  if (ENV === 'production') {
+  if (NODE_ENV === 'production') {
     console.warn(
       'store.auth.clearUsersTable was called while in production, ignoring'
     );
@@ -167,7 +167,7 @@ async function createSessions() {
  * clearing the table.
  */
 async function clearSessions(): Promise<void> {
-  if (ENV === 'production') {
+  if (NODE_ENV === 'production') {
     console.error('store.auth.clearSessions called in production, quitting');
     return Promise.resolve();
   }
