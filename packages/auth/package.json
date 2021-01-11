@@ -4,7 +4,8 @@
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
-    "start:watch": "tsc -w > /dev/null"
+    "start:watch": "tsc -w > /dev/null",
+    "clean": "rimraf ./lib tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",

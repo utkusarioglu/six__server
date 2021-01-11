@@ -19,6 +19,7 @@
   "scripts": {
     "start:dev": "run-p start:watcher start:watch",
     "start:watcher": "nodemon",
-    "start:watch": "$(yarn bin)/lerna run --parallel start:watch"
+    "start:watch": "$(yarn bin)/lerna run --parallel start:watch",
+    "clean": "lerna run --parallel clean"
   }
 }
