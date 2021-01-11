@@ -173,13 +173,3 @@ export function checkAuth(req: Request, res: Response, next: NextFunction) {
 }
 
 export const passport = Passport;
-
-/**
- * Data that is expected from the user for the sign up
- */
-interface SignupUserSupplied {
-  username: string;
-  password: string;
-  email: string;
-  age: number;
-}
