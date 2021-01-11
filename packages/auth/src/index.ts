@@ -13,7 +13,7 @@ import {
 } from './validation/validation';
 import { SESSION_SECRET, SECURE_SCHEMES } from './config';
 import type { Express, Request, Response, NextFunction } from 'express';
-import type { UserModel } from '../../store/src/methods/auth';
+import type { UserInsert } from 'six__server__store/src/models/user/user.types';
 
 const LocalStrategy = passportLocal.Strategy;
 
@@ -33,7 +33,7 @@ Passport.use(
         return done({ error: 'pass not within length params' });
       }
 
-      store.auth.getUserByUsername(username).then((user) => {
+      store.user.selectByUsername(username).then((user) => {
         if (!user) {
           return done(null, false);
         }
@@ -49,6 +49,15 @@ Passport.use(
     }
   )
 );
+
+Passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+Passport.deserializeUser((user, done) => {
+  // @ts-ignore
+  done(null, user);
+});
 
 export function useAuth(app: Express) {
   // app.set('trust_proxy', 1);
@@ -78,7 +87,7 @@ export function useAuth(app: Express) {
       }
 
       if (!user) {
-        return res.send({ message: 'fail' });
+        return res.json({ message: 'failed' });
       }
 
       req.login(user, (err) => {
@@ -86,21 +95,15 @@ export function useAuth(app: Express) {
           console.warn(`login error:\n${err}`);
           return next(err);
         }
-        return res.send({ message: 'login success' });
+        return res.json({ message: 'login success' });
       });
     })(req, res, next);
   });
 
   app.post('/api/logout', async (req, _res, next) => {
     if (req.user) {
-      await store.auth
-        .removeSession(req.user)
-        .then(() => {
-          req.logout();
-          next('logged out');
-        })
-        // store session removal fail
-        .catch(console.error);
+      req.logout();
+      next('logged out');
     } else {
       next("wasn't logged in");
     }
@@ -129,21 +132,21 @@ export function useAuth(app: Express) {
       return res.json({ error: 'ageist' });
     }
 
-    store.auth
-      .getUserByUsername(username)
+    store.user
+      .selectByUsername(username)
       .then(async (user) => {
         if (user === false) {
           bcrypt
             .hash(password, 10)
             .then((passwordHashed) => {
-              const userModel: UserModel = {
-                user_id: uuidv4(),
+              const userModel: UserInsert = {
+                id: uuidv4(),
                 username,
                 password: passwordHashed,
                 email,
                 age,
               };
-              store.auth.insertUser(userModel).then(() => {
+              store.user.insert(userModel).then(() => {
                 console.log('user inserted');
                 req.login(userModel, (err) => {
                   if (err) {
