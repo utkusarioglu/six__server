@@ -156,4 +156,12 @@ export abstract class Model<Insert> {
     }
     return true;
   }
+
+  /**
+   * Wrapper for the particular connector's raw method
+   * @param rawString raw string to be used in the query
+   */
+  protected _raw(rawString: string) {
+    return this._getConnector().raw(rawString);
+  }
 }
