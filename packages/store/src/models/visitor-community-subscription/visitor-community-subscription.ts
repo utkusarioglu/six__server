@@ -15,7 +15,7 @@ export class VisitorCommunitySubscriptionStore extends Model<VisitorCommunitySub
    */
   async createTable() {
     return this._createTable((t) => {
-      t.uuid('id').primary().defaultTo(postgres.raw('uuid_generate_v4()'));
+      t.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       t.uuid('community_id').notNullable();
 
       t.foreign('community_id')

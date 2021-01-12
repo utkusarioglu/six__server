@@ -16,7 +16,7 @@ export class UserStore extends Model<UserInsert> {
    */
   async createTable() {
     return this._createTable((t) => {
-      t.uuid('id').primary().defaultTo(postgres.raw('uuid_generate_v4()'));
+      t.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       t.string('username');
       // TODO create a custom domain for this if in production
       t.string('password');

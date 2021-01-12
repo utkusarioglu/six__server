@@ -15,7 +15,7 @@ export class CommentVoteStore extends Model<CommentVoteInsert> {
    */
   async createTable() {
     return this._createTable((table) => {
-      table.uuid('id').primary().defaultTo(postgres.raw('uuid_generate_v4()'));
+      table.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       table.uuid('vote_id');
       table.uuid('comment_id');
 

@@ -15,9 +15,9 @@ export class CommentStore extends Model<CommentInsert> {
    */
   async createTable() {
     return this._createTable((table) => {
-      table.uuid('id').primary().defaultTo(postgres.raw('uuid_generate_v4()'));
+      table.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       table.uuid('parent_id').defaultTo(null);
-      table.timestamp('created_at').defaultTo(postgres.fn.now());
+      table.timestamp('created_at').defaultTo(this._now());
       table.string('body');
       /**
        * Every comment starts with 1 like from the person who submits the

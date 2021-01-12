@@ -13,7 +13,7 @@ export class PostStore extends Model<PostInsert> {
     'posts.created_at',
     'title',
     'body',
-    postgres.raw('like_count - dislike_count AS vote_count'),
+    this._raw('like_count - dislike_count AS vote_count'),
     'comment_count',
     'unique_commenter_count',
     'name AS community_name',
@@ -31,8 +31,8 @@ export class PostStore extends Model<PostInsert> {
    */
   async createTable() {
     return this._createTable((table) => {
-      table.uuid('id').primary().defaultTo(postgres.raw('uuid_generate_v4()'));
-      table.timestamp('created_at').defaultTo(postgres.fn.now());
+      table.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
+      table.timestamp('created_at').defaultTo(this._now());
       table.string('title');
       table.string('body');
       table.integer('dislike_count').defaultTo(0);

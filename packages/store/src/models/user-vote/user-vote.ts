@@ -15,7 +15,7 @@ export class UserVoteStore extends Model<UserVoteInsert> {
    */
   async createTable() {
     return this._createTable((t) => {
-      t.uuid('id').primary().defaultTo(postgres.raw('uuid_generate_v4()'));
+      t.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       t.uuid('user_id');
       t.uuid('vote_id');
 

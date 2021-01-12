@@ -15,7 +15,7 @@ export class CommunityPostStore extends Model<CommunityPostInsert> {
    */
   async createTable() {
     return this._createTable((table) => {
-      table.uuid('id').primary().defaultTo(postgres.raw('uuid_generate_v4()'));
+      table.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       table.uuid('post_id');
       table.uuid('community_id');
 

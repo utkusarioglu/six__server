@@ -15,9 +15,9 @@ export class VoteStore extends Model<VoteInsert> {
    */
   async createTable() {
     return this._createTable((t) => {
-      t.uuid('id').primary().defaultTo(postgres.raw('uuid_generate_v4()'));
+      t.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       t.integer('vote_type');
-      t.timestamp('created_ad').defaultTo(postgres.fn.now());
+      t.timestamp('created_ad').defaultTo(this._now());
     });
   }
 }

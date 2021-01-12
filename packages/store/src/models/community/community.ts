@@ -15,8 +15,8 @@ export class CommunityStore extends Model<CommunityUserInsert> {
    */
   async createTable() {
     return this._createTable((table) => {
-      table.uuid('id').primary().defaultTo(postgres.raw('uuid_generate_v4()'));
-      table.timestamp('created_at').defaultTo(postgres.fn.now());
+      table.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
+      table.timestamp('created_at').defaultTo(this._now());
       table.string('description_text');
       table.string('name');
       table.integer('post_count').defaultTo(0);
