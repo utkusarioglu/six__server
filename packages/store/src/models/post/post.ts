@@ -9,6 +9,7 @@ export class PostStore extends Model<PostInsert> {
    * visitors
    */
   private _post_columns = [
+    'posts.id',
     'posts.created_at',
     'title',
     'body',
