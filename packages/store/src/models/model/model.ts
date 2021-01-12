@@ -164,4 +164,11 @@ export abstract class Model<Insert> {
   protected _raw(rawString: string) {
     return this._getConnector().raw(rawString);
   }
+
+  /**
+   * Returns current time for the particular connector
+   */
+  protected _now() {
+    return this._getConnector().fn.now();
+  }
 }
