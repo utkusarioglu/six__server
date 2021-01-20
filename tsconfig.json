@@ -11,7 +11,8 @@
     "paths": {
       "six__server__store": ["./packages/store/src"],
       "six__server__auth": ["./packages/auth/src"],
-      "six__server__main": ["./packages/main/src"]
+      "six__server__main": ["./packages/main/src"],
+      "six__public-api": ["../public-api/src"]
     },
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

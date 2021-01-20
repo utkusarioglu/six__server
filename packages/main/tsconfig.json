@@ -5,7 +5,11 @@
     "composite": true,
     "outDir": "lib"
   },
+  "include": ["src"],
   "references": [
+    {
+      "path": "../../../public-api"
+    },
     {
       "path": "../store/"
     },
