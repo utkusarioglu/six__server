@@ -1,7 +1,7 @@
 {
   "name": "six__server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "packages/main/lib/index.js",
   "license": "MIT",
   "private": true,
   "devDependencies": {
