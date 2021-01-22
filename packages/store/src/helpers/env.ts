@@ -1,4 +1,4 @@
-import { NODE_ENV } from '../config';
+import { NODE_ENV } from 'six__server__global';
 
 /**
  * Returns false if NODE_ENV is set to production
