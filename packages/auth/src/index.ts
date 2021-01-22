@@ -11,7 +11,7 @@ import {
   isValidEmail,
   isValidAge,
 } from './validation/validation';
-import { SESSION_SECRET, SECURE_SCHEMES } from './config';
+import { SESSION_SECRET, SECURE_SCHEMES } from 'six__server__global';
 import type { Express, Request, Response, NextFunction } from 'express';
 import type { UserInsert } from 'six__server__store/src/models/user/user.types';
 

@@ -1,5 +1,5 @@
 import Knex from 'knex';
-import { PG_DB, PG_PASSWORD, PG_USER } from '../config';
+import { PG_DB, PG_PASSWORD, PG_USER } from 'six__server__global';
 
 const postgres = Knex({
   client: 'postgres',

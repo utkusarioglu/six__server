@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { HTTP_PORT, ALLOWED_ORIGINS, NODE_ENV } from './config';
+import { HTTP_PORT, ALLOWED_ORIGINS, NODE_ENV } from 'six__server__global';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { useAuth, checkAuth } from 'six__server__auth';

@@ -6,6 +6,7 @@ import {
   VISITOR_COMMUNITIES,
   USER_COMMUNITY_SUBSCRIPTIONS,
 } from './constants';
+import { NODE_ENV } from 'six__server__global';
 
 async function mockUsers(): Promise<void> {
   await store.user.deleteAll();

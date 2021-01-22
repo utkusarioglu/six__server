@@ -5,12 +5,5 @@
     "composite": true,
     "outDir": "lib"
   },
-  "references": [
-    {
-      "path": "../global"
-    },
-    {
-      "path": "../store"
-    }
-  ]
+  "include": ["src"]
 }

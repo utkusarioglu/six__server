@@ -1,5 +1,5 @@
 import type Knex from 'knex';
-import { NODE_ENV } from '../../config';
+import { NODE_ENV } from 'six__server__global';
 import { ModelProps } from './model.types';
 
 /**

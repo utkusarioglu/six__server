@@ -9,6 +9,7 @@
     "strict": true,
     "baseUrl": "./",
     "paths": {
+      "six__server__global": [".packages/global/src"],
       "six__server__store": ["./packages/store/src"],
       "six__server__auth": ["./packages/auth/src"],
       "six__server__main": ["./packages/main/src"],
