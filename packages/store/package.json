@@ -24,5 +24,8 @@
   "scripts": {
     "start:watch": "tsc -w > /dev/null",
     "clean": "rimraf ./lib tsconfig.tsbuildinfo"
+  },
+  "devDependencies": {
+    "utility-types": "^3.10.0"
   }
 }
