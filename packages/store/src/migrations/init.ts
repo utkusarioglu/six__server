@@ -11,6 +11,7 @@ export async function initStore(store: typeof Store): Promise<void> {
   await store.post.createTable();
   await store.community.createTable();
   await store.vote.createTable();
+  await store.userContent.createTable();
 
   // associations
   await store.commentVote.createTable();
@@ -23,6 +24,7 @@ export async function initStore(store: typeof Store): Promise<void> {
   await store.userPost.createTable();
   await store.userVote.createTable();
   await store.visitorCommunitySubscription.createTable();
+  await store.postUserContent.createTable();
 
   return;
 }

@@ -1,4 +1,4 @@
-import { initStore } from './sets/init';
+import { initStore } from './migrations/init';
 import { sessionConnector } from './connectors/session';
 import postgres from './connectors/postgres';
 
