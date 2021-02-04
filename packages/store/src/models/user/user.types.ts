@@ -7,7 +7,7 @@ export interface UserInsert {
   /**
    * ! Remove this before production
    */
-  id?: string;
+  id: string;
 
   username: UserPostReq['req']['username'];
   password: UserPostReq['req']['password'];

@@ -61,7 +61,6 @@ Passport.deserializeUser<Express.User>((user, done) => {
 });
 
 export function useAuth(app: Express) {
-  // app.set('trust_proxy', 1);
   app.use(
     expressSession({
       proxy: true,
@@ -148,8 +147,17 @@ export function useAuth(app: Express) {
                 age,
               };
               store.user.insert(userModel).then(() => {
-                console.log('user inserted');
-                req.login(userModel, (err) => {
+                const userLogin: Express.User = (({
+                  id,
+                  username,
+                  password,
+                }) => ({
+                  id,
+                  username,
+                  password,
+                }))(userModel);
+
+                req.login(userLogin, (err: string) => {
                   if (err) {
                     return next(err);
                   }
