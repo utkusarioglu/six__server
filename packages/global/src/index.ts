@@ -1,3 +1,10 @@
+/**
+ * Global types become available in every package that imports environment
+ * variables
+ */
+import './@types/express';
+import './@types/node';
+
 const {
   SERVER_HTTP_PORT,
   SERVER_ALLOWED_ORIGINS,
