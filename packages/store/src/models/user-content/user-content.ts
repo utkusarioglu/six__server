@@ -1,8 +1,14 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import { CommunityModel, CommunityInsert } from './community.types';
+import type { UserContentInsert, UserContentModel } from './user-content.types';
 
-export class CommunityStore extends Model<CommunityInsert, CommunityModel> {
+/**
+ * Represents uploaded user content
+ */
+export class UserContentStore extends Model<
+  UserContentInsert,
+  UserContentModel
+> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}
@@ -16,18 +22,14 @@ export class CommunityStore extends Model<CommunityInsert, CommunityModel> {
   async createTable() {
     return this._createTable((table) => {
       table.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
-      table.timestamp('created_at').defaultTo(this._now());
-      table.string('description');
-      table.string('name');
-      table.string('slug');
-      table.integer('post_count').defaultTo(0);
-      table.integer('subscriber_count').defaultTo(1);
+      table.string('filename');
+      table.string('type'); // maybe there is a mime type option for this
     });
   }
 }
 
-export default new CommunityStore({
-  singular: 'community',
-  plural: 'communities',
+export default new UserContentStore({
+  singular: 'user_content',
+  plural: 'user_contents',
   connector: postgres,
 });

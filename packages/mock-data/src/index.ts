@@ -5,6 +5,7 @@ import {
   POSTS,
   VISITOR_COMMUNITIES,
   USER_COMMUNITY_SUBSCRIPTIONS,
+  USER_CONTENTS,
 } from './constants';
 import { NODE_ENV } from 'six__server__global';
 
@@ -29,6 +30,11 @@ async function mockComments() {
 
 async function mockVotes() {
   await store.vote.deleteAll();
+}
+
+async function mockUserContents() {
+  await store.userContent.deleteAll();
+  await store.userContent.insert(USER_CONTENTS);
 }
 
 /**
@@ -66,8 +72,10 @@ async function clearNaryAssociations() {
  * This function should not be called in production
  */
 export async function createMockData(): Promise<void> {
+  if (NODE_ENV === 'test') return Promise.resolve();
   // await clearNaryAssociations();
   await mockUsers();
+  await mockUserContents();
   await mockCommunities();
   await mockVotes();
   await mockPosts();

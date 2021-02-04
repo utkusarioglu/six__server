@@ -1,8 +1,8 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import { VoteInsert } from './vote.types';
+import { VoteInsert, VoteModel } from './vote.types';
 
-export class VoteStore extends Model<VoteInsert> {
+export class VoteStore extends Model<VoteInsert, VoteModel> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}
@@ -17,7 +17,7 @@ export class VoteStore extends Model<VoteInsert> {
     return this._createTable((t) => {
       t.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       t.integer('vote_type');
-      t.timestamp('created_ad').defaultTo(this._now());
+      t.timestamp('created_at').defaultTo(this._now());
     });
   }
 }

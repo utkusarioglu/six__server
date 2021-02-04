@@ -1,8 +1,8 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import { UserPostInsert } from './user-post.types';
+import { UserPostInsert, UserPostModel } from './user-post.types';
 
-export class UserPostStore extends Model<UserPostInsert> {
+export class UserPostStore extends Model<UserPostInsert, UserPostModel> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}

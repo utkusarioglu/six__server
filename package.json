@@ -26,7 +26,7 @@
     "clean": "lerna run --parallel clean",
     "test:inside-container": "$(yarn bin)/jest",
     "test:ci": "$(yarn bin)/jest test --coverage --no-watchman a",
-    "test": "docker exec -it six__server bash -c '$(yarn bin)/jest'",
+    "test": "docker exec -it six__server bash -c 'NODE_ENV=test $(yarn bin)/jest'",
     "bash": "docker exec -it six__server bash"
   }
 }

@@ -17,6 +17,8 @@ import userPost from './models/user-post/user-post';
 import userVote from './models/user-vote/user-vote';
 import vote from './models/vote/vote';
 import visitorCommunitySubscription from './models/visitor-community-subscription/visitor-community-subscription';
+import userContent from './models/user-content/user-content';
+import postUserContent from './models/post-user-content/post-user-content';
 
 /**
  * Single source of store actions
@@ -37,6 +39,8 @@ const store = {
   userVote,
   vote,
   visitorCommunitySubscription,
+  userContent,
+  postUserContent,
 
   /**
    * Data sources that the store is using. This object gives access to

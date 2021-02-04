@@ -1,13 +1,16 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
 import {
-  CommunityPostInsert,
-  CommunityPostModel,
-} from './community-post.types';
+  PostUserContentInsert,
+  PostUserContentModel,
+} from './post-user-content.types';
 
-export class CommunityPostStore extends Model<
-  CommunityPostInsert,
-  CommunityPostModel
+/**
+ * Association table for connecting posts with user content (uploaded files)
+ */
+export class PostUserContentStore extends Model<
+  PostUserContentInsert,
+  PostUserContentModel
 > {
   /**
    * Creates the respective table in the connected database.
@@ -22,8 +25,8 @@ export class CommunityPostStore extends Model<
   async createTable() {
     return this._createTable((table) => {
       table.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
-      table.uuid('post_id');
-      table.uuid('community_id');
+      table.uuid('post_id').notNullable();
+      table.uuid('user_content_id').notNullable();
 
       table
         .foreign('post_id')
@@ -31,16 +34,16 @@ export class CommunityPostStore extends Model<
         .onDelete('CASCADE')
         .onUpdate('CASCADE');
       table
-        .foreign('community_id')
-        .references('communities.id')
+        .foreign('user_content_id')
+        .references('user_contents.id')
         .onDelete('CASCADE')
         .onUpdate('CASCADE');
     });
   }
 }
 
-export default new CommunityPostStore({
-  singular: 'community_post',
-  plural: 'community_posts',
+export default new PostUserContentStore({
+  singular: 'post_user_content',
+  plural: 'post_user_contents',
   connector: postgres,
 });

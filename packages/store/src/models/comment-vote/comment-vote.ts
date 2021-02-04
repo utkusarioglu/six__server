@@ -1,8 +1,11 @@
 import postgres from '../../connectors/postgres';
-import { CommentVoteInsert } from './comment-vote.types';
+import { CommentVoteInsert, CommentVoteModel } from './comment-vote.types';
 import { Model } from '../model/model';
 
-export class CommentVoteStore extends Model<CommentVoteInsert> {
+export class CommentVoteStore extends Model<
+  CommentVoteInsert,
+  CommentVoteModel
+> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}

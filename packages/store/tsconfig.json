@@ -8,6 +8,9 @@
   "references": [
     {
       "path": "../auth"
+    },
+    {
+      "path": "../../../public-api"
     }
   ]
 }
