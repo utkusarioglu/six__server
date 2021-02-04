@@ -1,5 +1,7 @@
 import express from 'express';
 import store from 'six__server__store';
+import type { PostsGetRes } from 'six__public-api';
+import { v4 as uuid } from 'uuid';
 
 const router = express.Router();
 
@@ -17,14 +19,33 @@ router.get('/headers', (req, res) => {
 });
 
 router.get('/posts', async (req, res) => {
-  const posts =
+  const postsList =
     req.isAuthenticated() && req.user.id
       ? await store.post.selectUserPosts(req.user.id)
       : await store.post.selectVisitorPosts();
 
-  console.group('user id\n', req.user, '\n', posts);
+  const postsResponse: PostsGetRes = {
+    id: uuid(),
+    res: postsList,
+  };
 
-  res.json(posts);
+  res.json(postsResponse);
+});
+
+router.get('/post/slug/:postSlug', async (req, res) => {
+  const postSlug = req.params.postSlug;
+
+  const postsList = await store.post
+    .selectPostBySlug(postSlug)
+    .then((posts) => posts.pop())
+    .catch((e) => console.error(e));
+
+  const postsResponse: PostsGetRes = {
+    id: uuid(),
+    res: postsList,
+  };
+
+  res.json(postsResponse);
 });
 
 export default router;
