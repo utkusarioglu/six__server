@@ -25,13 +25,16 @@ app.use(
 );
 useAuth(app);
 
+// app.use('/files', express.static(path.join(__dirname, 'public')));
 app.use('/api', insecure);
 app.use('/api/auth', checkAuth, secure);
 app.use(fourOFour);
 
 if (NODE_ENV !== 'production') {
   store.initStore().then(() => {
-    createMockData();
+    if (NODE_ENV === 'development') {
+      createMockData();
+    }
   });
 }
 
