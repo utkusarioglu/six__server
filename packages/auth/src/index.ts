@@ -33,19 +33,21 @@ Passport.use(
         return done({ error: 'pass not within length params' });
       }
 
-      store.user.selectByUsername(username).then((user) => {
-        if (!user) {
-          return done(null, false);
-        }
-
-        bcrypt.compare(password, user.password).then((result) => {
-          console.log({ user, password, result });
-          if (!result) {
+      store.user
+        .selectByUsername(username)
+        .then((user: Express.User | false) => {
+          if (!user) {
             return done(null, false);
           }
-          return done(null, user);
+
+          bcrypt.compare(password, user.password).then((result) => {
+            console.log({ user, password, result });
+            if (!result) {
+              return done(null, false);
+            }
+            return done(null, user);
+          });
         });
-      });
     }
   )
 );
@@ -54,8 +56,7 @@ Passport.serializeUser((user, done) => {
   done(null, user);
 });
 
-Passport.deserializeUser((user, done) => {
-  // @ts-ignore
+Passport.deserializeUser<Express.User>((user, done) => {
   done(null, user);
 });
 
