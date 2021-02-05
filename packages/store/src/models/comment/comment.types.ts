@@ -6,6 +6,7 @@ import type { CommentSqlAutoSave, CommentSavePostReq } from 'six__public-api';
  */
 export interface CommentInsert {
   post_id: CommentSavePostReq['req']['postId'];
+  user_id: CommentSavePostReq['req']['userId'];
   parent_id: CommentSavePostReq['req']['parentId'];
   body: CommentSavePostReq['req']['body'];
 }
