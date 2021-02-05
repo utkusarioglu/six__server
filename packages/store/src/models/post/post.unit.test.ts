@@ -20,12 +20,11 @@ const requestColumns: PostGetResInternal['res'] = {
   likeCount: 0,
   dislikeCount: 0,
   commentCount: 0,
-  uniqueCommenterCount: 0,
   communitySlug: '',
   communityName: '',
   mediaImagePath: '',
   mediaType: 'none',
-  postCreatorUsername: '',
+  creatorUsername: '',
 };
 
 describe(`
