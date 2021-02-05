@@ -2,6 +2,7 @@ import express from 'express';
 import store from 'six__server__store';
 import type { PostsGetRes } from 'six__public-api';
 import { v4 as uuid } from 'uuid';
+import { CommentsGetRes } from 'six__public-api';
 
 const router = express.Router();
 
@@ -30,6 +31,21 @@ router.get('/posts', async (req, res) => {
   };
 
   res.json(postsResponse);
+});
+
+router.get('/post/slug/:postSlug/comments', async (req, res) => {
+  const postSlug = req.params.postSlug;
+
+  const commentsList = await store.comment.selectByPostSlug(postSlug);
+
+  const commentsResponse: CommentsGetRes = {
+    id: uuid(),
+    res: commentsList,
+  };
+
+  console.log(commentsResponse);
+
+  res.json(commentsResponse);
 });
 
 router.get('/post/slug/:postSlug', async (req, res) => {
