@@ -48,7 +48,9 @@ export class PostStore extends Model<PostInsert, PostModel> {
       table.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       table.timestamp('created_at').defaultTo(this._now());
       table.string('title').notNullable();
-      table.string('body').notNullable();
+      // TODO model typing does not recognize this kind of use in text
+      // @ts-ignore
+      table.text('body', ['longtext']).notNullable();
       table.string('slug').notNullable();
       table.integer('dislike_count').defaultTo(0);
       /**
