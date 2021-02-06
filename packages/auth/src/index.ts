@@ -5,7 +5,7 @@ import store from 'six__server__store';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  usernameLengthValid,
+  emailValid,
   passwordLengthValid,
   passwordStrengthAcceptable,
   isValidEmail,
@@ -14,6 +14,7 @@ import {
 import { SESSION_SECRET, SECURE_SCHEMES } from 'six__server__global';
 import type { Express, Request, Response, NextFunction } from 'express';
 import type { UserInsert } from 'six__server__store/src/models/user/user.types';
+import type { UserLoginPostRes } from 'six__public-api';
 
 const LocalStrategy = passportLocal.Strategy;
 
@@ -21,33 +22,30 @@ Passport.use(
   'local',
   new LocalStrategy(
     {
-      usernameField: 'username',
+      usernameField: 'email',
       passwordField: 'password',
     },
-    async (username, password, done) => {
-      if (!usernameLengthValid(username)) {
-        return done({ error: 'username not within length params' });
+    async (email, password, done) => {
+      if (!emailValid(email)) {
+        return done('username not within length params');
       }
 
       if (!passwordLengthValid(password)) {
-        return done({ error: 'pass not within length params' });
+        return done('pass not within length params');
       }
 
-      store.user
-        .selectByUsername(username)
-        .then((user: Express.User | false) => {
-          if (!user) {
+      store.user.selectByEmail(email).then((user: Express.User | false) => {
+        if (!user) {
+          return done(null, false);
+        }
+
+        bcrypt.compare(password, user.password).then((result) => {
+          if (!result) {
             return done(null, false);
           }
-
-          bcrypt.compare(password, user.password).then((result) => {
-            console.log({ user, password, result });
-            if (!result) {
-              return done(null, false);
-            }
-            return done(null, user);
-          });
+          return done(null, user);
         });
+      });
     }
   )
 );
@@ -95,7 +93,21 @@ export function useAuth(app: Express) {
           console.warn(`login error:\n${err}`);
           return next(err);
         }
-        return res.json({ message: 'login success' });
+
+        const { username, age, id, email } = user;
+
+        const userLoginSuccess: UserLoginPostRes = {
+          id: 'some_id',
+          res: {
+            loggedIn: true,
+            username,
+            age,
+            id,
+            email,
+          },
+        };
+
+        return res.json(userLoginSuccess);
       });
     })(req, res, next);
   });
@@ -112,7 +124,7 @@ export function useAuth(app: Express) {
   app.post('/api/signup', async (req, res, next) => {
     const { username, password, email, age } = req.body;
 
-    if (!usernameLengthValid(username)) {
+    if (!emailValid(username)) {
       return res.json({ error: 'username length boo' });
     }
 
@@ -133,7 +145,7 @@ export function useAuth(app: Express) {
     }
 
     store.user
-      .selectByUsername(username)
+      .selectByEmail(username)
       .then(async (user) => {
         if (user === false) {
           bcrypt

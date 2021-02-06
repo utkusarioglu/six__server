@@ -4,7 +4,7 @@ import {
   USERNAME_LENGTH_MAX,
   PASSWORD_LENGTH_MIN,
   PASSWORD_LENGTH_MAX,
-} from '../config';
+} from 'six__server__global';
 
 /**
  * Checks if the username given falls within the accepted username
@@ -12,11 +12,8 @@ import {
  * These parameters are supplied through the environment variables
  * @param username username to check
  */
-export function usernameLengthValid(username: string): boolean {
-  return validator.isLength(username, {
-    min: USERNAME_LENGTH_MIN,
-    max: USERNAME_LENGTH_MAX,
-  });
+export function emailValid(username: string): boolean {
+  return validator.isEmail(username);
 }
 
 /**
