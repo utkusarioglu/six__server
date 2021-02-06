@@ -1,8 +1,7 @@
 import express from 'express';
 import store from 'six__server__store';
-import type { PostsGetRes } from 'six__public-api';
+import type { PostsGetRes, CommentsGetRes } from 'six__public-api';
 import { v4 as uuid } from 'uuid';
-import { CommentsGetRes } from 'six__public-api';
 
 const router = express.Router();
 
