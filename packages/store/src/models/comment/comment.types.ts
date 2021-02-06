@@ -1,4 +1,8 @@
-import type { CommentSqlAutoSave, CommentSavePostReq } from 'six__public-api';
+import type {
+  CommentSqlAutoSave,
+  CommentSavePostReq,
+  CommentsGetRes,
+} from 'six__public-api';
 
 /**
  * Defines the properties of comment that needs to come from
@@ -25,3 +29,8 @@ export interface CommentInsertAuto {
  * Shape of comment table rows
  */
 export type CommentModel = CommentInsertAuto & CommentInsert;
+
+/**
+ * Shape of return when Comments for a particular post is being returned
+ */
+export type CommentsForPostSlug = CommentsGetRes['res'];

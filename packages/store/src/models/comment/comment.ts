@@ -1,7 +1,11 @@
 import { uuid } from '../../@types/helpers';
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import { CommentInsert, CommentModel } from './comment.types';
+import {
+  CommentInsert,
+  CommentModel,
+  CommentsForPostSlug,
+} from './comment.types';
 
 export class CommentStore extends Model<CommentInsert, CommentModel> {
   /**
@@ -87,16 +91,52 @@ export class CommentStore extends Model<CommentInsert, CommentModel> {
 
   // !shouldn't be post slug, this is connected data
   async selectByPostSlug(postSlug: string) {
-    return Promise.resolve([
+    console.log('comments fro post slug:', postSlug);
+    const mockComments: CommentsForPostSlug = [
       {
         id: 'id',
+        postSlug: 'i-like-rabbits-more-than-ducks',
         parentId: null,
-        createdAt: 'some time',
-        body: 'this is the text of the comment',
+        createdAt: new Date(Date.now()).toISOString(),
+        body: 'Hitler also liked rabbits. You suck!!!1!',
         likeCount: 1,
         dislikeCount: 1,
+        creatorUsername: 'MassiveHuman_yes',
       },
-    ]);
+      {
+        id: 'id2',
+        postSlug: 'i-like-rabbits-more-than-ducks',
+        parentId: null,
+        createdAt: new Date(Date.now()).toISOString(),
+        body: 'Turkey is not europe. Rabbits turkey',
+        likeCount: 1,
+        dislikeCount: 1,
+        creatorUsername: 'iLikeSomeBanana321',
+      },
+      {
+        id: 'id3',
+        postSlug: 'some-other-post',
+        parentId: null,
+        createdAt: new Date(Date.now()).toISOString(),
+        body: 'Turkey is not europe. Rabbits turkey',
+        likeCount: 1,
+        dislikeCount: 1,
+        creatorUsername: 'iLikeSomeBanana321',
+      },
+      {
+        id: 'id4',
+        postSlug: 'i-like-rabbits-more-than-ducks',
+        parentId: null,
+        createdAt: new Date(Date.now()).toISOString(),
+        body:
+          'I liked rabbits since they saved my husbands banana from drowning during our vacation in kuala-pampur. rabbits rule!',
+        likeCount: 1,
+        dislikeCount: 1,
+        creatorUsername: 'no_more1usernames!',
+      },
+    ];
+
+    return Promise.resolve(mockComments);
   }
 }
 
