@@ -72,8 +72,10 @@ export class PostStore extends Model<PostInsert, PostModel> {
         .join('community_posts AS cp', 'cp.post_id', 'posts.id')
         .join('communities AS c', 'c.id', 'cp.community_id')
         .join('user_community_subscriptions AS ucs', 'ucs.community_id', 'c.id')
+        .leftJoin('post_user_contents as puc', 'posts.id', 'puc.post_id')
+        .leftJoin('user_contents as uc', 'puc.user_content_id', 'uc.id')
         .select(this._post_columns)
-        .where({ user_id });
+        .where({ 'u.id': user_id });
     });
   }
 
