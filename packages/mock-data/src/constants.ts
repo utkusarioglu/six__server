@@ -9,7 +9,7 @@ export const USERS: UserInsert[] = [
   {
     id: 'fced7bf2-fa80-46fe-b83b-0cae45ca5db0',
     username: 'utkusarioglu',
-    password: '$2b$10$7O1nkhhxET9jgLY3FvAWseEgM5qELRtqeqlef051y3r9FD/XTwUZC',
+    password: '$2b$10$xMLpIKE0xPvIHmj2tCSAUuAaUFV.Ra9rtL1XWsF.6Q3fIACf0P.KS', // Mb8rx-rt4k7
     email: 'utkusarioglu@gmail.com',
     age: 36,
   },
@@ -60,7 +60,7 @@ export const POSTS: PostInsert[] = [
   },
   {
     title: 'I like rabbits more than ducks',
-    body: 'This is the body of my first post',
+    body: `I have been thinking about this for a long time and at this point, I'm entirely sure that ducks suck and rabbits rule. Think about it. All that rabbits do is to advance the neo-con ideals and the domination of bees over the asia-pacific region. Thanks to you guys and all the awesome work we have done in this community, I see everything clearly now.`,
     user_id: 'fced7bf2-fa80-46fe-b83b-0cae45ca5db0',
     community_id: '268944e3-55a3-4361-967c-c17f530a660b',
   },
