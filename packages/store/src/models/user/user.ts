@@ -27,13 +27,14 @@ export class UserStore extends Model<UserInsert, UserModel> {
 
   /**
    * Returns the user row from the users table that has the given usernameField
-   * @param username username string
+   * @param email username string
    * @returns false if there is no match, also false if there are somehow more
    * than one matches. It returns the user {@link User} if there is only one match
    */
-  async selectByUsername(username: string): Promise<Express.User | false> {
+  async selectByEmail(email: string): Promise<Express.User | false> {
     return this._queryBuilder((table) => {
-      return table.where({ username }).then((user) => {
+      return table.where({ email }).then((user) => {
+        console.log('store user', user);
         if (user.length !== 1) {
           return Promise.resolve(false);
         }

@@ -65,7 +65,7 @@ describe(`
     });
 
     await user.createTable();
-    await user.selectByUsername(randomUsername);
+    await user.selectByEmail(randomUsername);
 
     expect(queryHit).toBe(1);
 
@@ -84,7 +84,7 @@ describe(`
     });
 
     await user.createTable();
-    const userList = await user.selectByUsername(randomUsername);
+    const userList = await user.selectByEmail(randomUsername);
 
     expect(userList).toBe(false);
     expect(queryHit).toBe(1);
@@ -113,7 +113,7 @@ describe(`
     });
 
     await user.createTable();
-    const userList = await user.selectByUsername(randomUser.username);
+    const userList = await user.selectByEmail(randomUser.username);
 
     expect(userList).toStrictEqual(randomUser);
     expect(queryHit).toBe(1);
@@ -142,7 +142,7 @@ describe(`
     });
 
     await user.createTable();
-    const userList = await user.selectByUsername(randomUsers[0].username);
+    const userList = await user.selectByEmail(randomUsers[0].username);
 
     expect(userList).toStrictEqual(false);
     expect(queryHit).toBe(1);

@@ -1,4 +1,4 @@
-import type { UserPostReq, UserSqlAutoSave } from 'six__public-api';
+import type { UserSignupPostReq, UserSqlAutoSave } from 'six__public-api';
 
 /**
  * Properties needed for the User store insert operation
@@ -9,10 +9,10 @@ export interface UserInsert {
    */
   id: string;
 
-  username: UserPostReq['req']['username'];
-  password: UserPostReq['req']['password'];
-  email: UserPostReq['req']['email'];
-  age: UserPostReq['req']['age'];
+  username: UserSignupPostReq['req']['username'];
+  password: UserSignupPostReq['req']['password'];
+  email: UserSignupPostReq['req']['email'];
+  age: UserSignupPostReq['req']['age'];
 }
 
 export interface UserSqlAutoInsert {
