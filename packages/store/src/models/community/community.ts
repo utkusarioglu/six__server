@@ -24,6 +24,23 @@ export class CommunityStore extends Model<CommunityInsert, CommunityModel> {
       table.integer('subscriber_count').defaultTo(1);
     });
   }
+
+  /**
+   * Selects the communities list for the consumption of community feed
+   */
+  async selectAllForCommunityFeed() {
+    return this._queryBuilder((table) =>
+      table.select({
+        id: 'id',
+        createdAt: 'created_at',
+        description: 'description',
+        name: 'name',
+        slug: 'slug',
+        postCount: 'post_count',
+        subscriberCount: 'subscriber_count',
+      })
+    );
+  }
 }
 
 export default new CommunityStore({

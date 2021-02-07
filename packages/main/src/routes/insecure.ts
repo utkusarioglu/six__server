@@ -69,11 +69,10 @@ router.get('/post/slug/:postSlug', async (req, res) => {
 
 router.get('/communities', async (req, res) => {
   const communitiesList =
-    (await store.community.selectAll().catch(console.log)) || [];
+    (await store.community.selectAllForCommunityFeed()) || [];
 
   const communitiesResponse: CommunitiesGetRes = {
     id: uuid(),
-    // @ts-ignore
     res: communitiesList,
   };
 
