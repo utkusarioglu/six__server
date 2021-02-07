@@ -5,6 +5,7 @@ import store from 'six__server__store';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  usernameValid,
   emailValid,
   passwordLengthValid,
   passwordStrengthAcceptable,
@@ -124,8 +125,8 @@ export function useAuth(app: Express) {
   app.post('/api/signup', async (req, res, next) => {
     const { username, password, email, age } = req.body;
 
-    if (!emailValid(username)) {
-      return res.json({ error: 'username length boo' });
+    if (!emailValid(email)) {
+      return res.json({ error: 'email boo' });
     }
 
     if (!passwordLengthValid(password)) {
@@ -174,7 +175,10 @@ export function useAuth(app: Express) {
                     return next(err);
                   }
 
-                  return res.json({ message: 'logged in' });
+                  return res.json({
+                    id: 'some_id',
+                    res: { ...userLogin, loggedIn: true },
+                  });
                 });
               });
             })
