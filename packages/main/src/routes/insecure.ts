@@ -1,6 +1,10 @@
 import express from 'express';
 import store from 'six__server__store';
-import type { PostsGetRes, CommentsGetRes } from 'six__public-api';
+import type {
+  PostsGetRes,
+  CommentsGetRes,
+  CommunitiesGetRes,
+} from 'six__public-api';
 import { v4 as uuid } from 'uuid';
 
 const router = express.Router();
@@ -61,6 +65,19 @@ router.get('/post/slug/:postSlug', async (req, res) => {
   };
 
   res.json(postsResponse);
+});
+
+router.get('/communities', async (req, res) => {
+  const communitiesList =
+    (await store.community.selectAll().catch(console.log)) || [];
+
+  const communitiesResponse: CommunitiesGetRes = {
+    id: uuid(),
+    // @ts-ignore
+    res: communitiesList,
+  };
+
+  res.json(communitiesResponse);
 });
 
 export default router;
