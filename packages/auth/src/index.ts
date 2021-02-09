@@ -5,7 +5,6 @@ import store from 'six__server__store';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  usernameValid,
   emailValid,
   passwordLengthValid,
   passwordStrengthAcceptable,
@@ -15,7 +14,11 @@ import {
 import { SESSION_SECRET, SECURE_SCHEMES } from 'six__server__global';
 import type { Express, Request, Response, NextFunction } from 'express';
 import type { UserInsert } from 'six__server__store/src/models/user/user.types';
-import type { UserLoginPostRes } from 'six__public-api';
+import type {
+  UserLoginPostRes,
+  UserSessionGetRes,
+  UserLogoutPostRes,
+} from 'six__public-api';
 
 const LocalStrategy = passportLocal.Strategy;
 
@@ -79,6 +82,27 @@ export function useAuth(app: Express) {
   app.use(Passport.initialize());
   app.use(Passport.session());
 
+  app.get('/api/session', (req, res) => {
+    if (req.user) {
+      const sessionInfo: UserSessionGetRes = {
+        id: 'some_id',
+        res: {
+          ...req.user,
+          // @ts-ignore
+          loggedIn: true,
+        },
+      };
+      res.json(sessionInfo);
+    } else {
+      const sessionInfo: UserSessionGetRes = {
+        id: 'some_id',
+        // @ts-ignore
+        res: { loggedIn: false },
+      };
+      res.json(sessionInfo);
+    }
+  });
+
   app.post('/api/login', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
       if (err) {
@@ -113,12 +137,29 @@ export function useAuth(app: Express) {
     })(req, res, next);
   });
 
-  app.post('/api/logout', async (req, _res, next) => {
+  app.post('/api/logout', async (req, res, next) => {
     if (req.user) {
       req.logout();
-      next('logged out');
+      // UserLogoutPostRes;
+      // next(null);
+      const logoutResponse: UserLogoutPostRes = {
+        id: 'some id',
+        res: {
+          loggedIn: false,
+        },
+      };
+
+      res.json(logoutResponse);
     } else {
-      next("wasn't logged in");
+      const logoutResponse: UserLogoutPostRes = {
+        id: 'some id',
+        res: {
+          loggedIn: false,
+        },
+      };
+      res.json(logoutResponse);
+
+      // next("wasn't logged in");
     }
   });
 
