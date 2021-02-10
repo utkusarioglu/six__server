@@ -4,6 +4,11 @@ import type {
   PostsGetRes,
   CommentsGetRes,
   CommunitiesGetRes,
+  UserCommunitySubscriptionCreateReqParams,
+  UserCommunitySubscriptionCreatePostReq,
+  UserCommunitySubscriptionCreatePostRes,
+  UserCommunitySubscriptionRemovePostReq,
+  UserCommunitySubscriptionRemovePostRes,
 } from 'six__public-api';
 import { v4 as uuid } from 'uuid';
 
@@ -78,5 +83,39 @@ router.get('/communities', async (req, res) => {
 
   res.json(communitiesResponse);
 });
+
+router.post<UserCommunitySubscriptionCreateReqParams>(
+  '/user/:userId/subscribe/:communityId',
+  async (req, res) => {
+    const { userId, communityId } = req.params;
+    try {
+      const subscription = await store.userCommunitySubscription.insert({
+        user_id: userId,
+        community_id: communityId,
+      });
+
+      if (subscription) {
+        const response: UserCommunitySubscriptionCreatePostRes = {
+          id: 'some_id',
+          res: {
+            communityId: subscription[0].community_id,
+            userId: subscription[0].user_id,
+          },
+        };
+        res.json(response);
+      } else {
+        res.json({
+          id: 'some id',
+          error: 'something went wrong with subscription save',
+        });
+      }
+    } catch (error) {
+      res.json({
+        id: 'some id',
+        error,
+      });
+    }
+  }
+);
 
 export default router;
