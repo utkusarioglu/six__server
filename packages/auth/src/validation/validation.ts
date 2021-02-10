@@ -7,16 +7,6 @@ import {
 } from 'six__server__global';
 
 /**
- * Checks if the username given falls within the accepted username
- * length parameters
- * These parameters are supplied through the environment variables
- * @param username username to check
- */
-export function emailValid(username: string): boolean {
-  return validator.isEmail(username);
-}
-
-/**
  * Checks if the password given falls within the accepted password
  * length parameters
  * These parameters are supplied through the environment variables
