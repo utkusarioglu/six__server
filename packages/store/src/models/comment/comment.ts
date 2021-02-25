@@ -111,61 +111,30 @@ export class CommentStore extends Model<CommentPipeline> {
   }
 
   // !shouldn't be post slug, this is connected data
-  async selectByPostSlug(postSlug: string) {
-    console.log('comments fro post slug:', postSlug);
-    const mockComments: CommentsForPostSlug[] = [
-      {
-        id: 'id',
-        postSlug: 'i-like-rabbits-more-than-ducks',
-        parentId: null,
-        createdAt: new Date(Date.now()).toISOString(),
-        body: 'Hitler also liked rabbits. You suck!!!1!',
-        likeCount: 1,
-        dislikeCount: 1,
-        creatorUsername: 'MassiveHuman_yes',
-        userId: '',
-        postId: '',
-      },
-      {
-        id: 'id2',
-        postSlug: 'i-like-rabbits-more-than-ducks',
-        parentId: null,
-        createdAt: new Date(Date.now()).toISOString(),
-        body: 'Turkey is not europe. Rabbits turkey',
-        likeCount: 1,
-        dislikeCount: 1,
-        creatorUsername: 'iLikeSomeBanana321',
-        userId: '',
-        postId: '',
-      },
-      {
-        id: 'id3',
-        postSlug: 'some-other-post',
-        parentId: null,
-        createdAt: new Date(Date.now()).toISOString(),
-        body: 'Turkey is not europe. Rabbits turkey',
-        likeCount: 1,
-        dislikeCount: 1,
-        creatorUsername: 'iLikeSomeBanana321',
-        userId: '',
-        postId: '',
-      },
-      {
-        id: 'id4',
-        postSlug: 'i-like-rabbits-more-than-ducks',
-        parentId: null,
-        createdAt: new Date(Date.now()).toISOString(),
-        body:
-          'I liked rabbits since they saved my husbands banana from drowning during our vacation in kuala-pampur. rabbits rule!',
-        likeCount: 1,
-        dislikeCount: 1,
-        creatorUsername: 'no_more1usernames!',
-        userId: '',
-        postId: '',
-      },
-    ];
+  async selectByPostId(postId: uuid) {
+    console.log('comments fro post slug:', postId);
+    return this._queryBuilder((table) => {
+      return table
+        .select([
+          'comments.id',
+          'comments.parent_id as parentId',
+          'comments.created_at as createdAt',
+          'comments.body as body',
+          'comments.like_count as likeCount',
+          'comments.dislike_count as dislikeCount',
 
-    return Promise.resolve(mockComments);
+          'p.slug as postSlug',
+          'p.id as postId',
+
+          'u.id as userId',
+          'u.username as creatorUsername',
+        ])
+        .join('post_comments as pc', 'comments.id', 'pc.comment_id')
+        .join('posts as p', 'p.id', 'pc.post_id')
+        .join('user_comments as uc', 'uc.comment_id', 'comments.id')
+        .join('users as u', 'u.id', 'uc.user_id')
+        .where({ 'pc.post_id': postId });
+    });
   }
 }
 
