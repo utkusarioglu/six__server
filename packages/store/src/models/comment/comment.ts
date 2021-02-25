@@ -2,7 +2,6 @@ import { uuid } from '../../@types/helpers';
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
 import {
-  CommentsForPostSlug,
   CommentInput,
   CommentPrepareInsert,
   CommentPipeline,
@@ -57,7 +56,7 @@ export class CommentStore extends Model<CommentPipeline> {
 
   async insert(commentInput: CommentInput) {
     const {
-      insert: commentInsert,
+      insert,
       foreign: { user_id, post_id },
     } = this.prepareInsert(commentInput);
 
@@ -79,7 +78,7 @@ export class CommentStore extends Model<CommentPipeline> {
         // save the comment
         await postgres('comments')
           .transacting(entities)
-          .insert(commentInsert, ['id'])
+          .insert(insert, ['id'])
           .then((returns) => (comment_id = returns[0].id))
           .catch(rollbackEntities);
 
@@ -87,7 +86,7 @@ export class CommentStore extends Model<CommentPipeline> {
         await postgres('posts')
           .transacting(entities)
           .increment('comment_count', 1)
-          .where({ post_id })
+          .where({ id: post_id })
           .catch(rollbackEntities);
       });
 
