@@ -4,6 +4,7 @@ import type {
   PostEndpoint,
   CommunityEndpoint,
   UserEndpoint,
+  CommentEndpoint,
 } from 'six__public-api';
 import { validateEndpoint } from '../helpers';
 
@@ -46,25 +47,22 @@ const router = express.Router();
 })();
 
 (() => {
-  type Method = PostEndpoint['_post_comment']['_v1'];
+  type Method = PostEndpoint['_comments']['_v1'];
   type Response = Method['_get']['_res']['Union'];
   type Params = Method['_get']['_req']['Params'];
   type Endpoint = Method['Endpoint'];
 
   router.get<Params, Response>(
-    validateEndpoint<Endpoint>('/post/comments/:postSlug/:requestId'),
+    validateEndpoint<Endpoint>('/post/:postId/comments/:requestId'),
     async (req, res) => {
-      const { postSlug, requestId } = req.params;
+      const { postId, requestId } = req.params;
+      const commentsList = await store.comment.selectByPostId(postId);
 
-      const commentsList = await store.comment.selectByPostSlug(postSlug);
-
-      const response: Response = {
+      res.json({
         id: requestId,
         state: 'success' as 'success',
         body: commentsList,
-      };
-
-      res.json(response);
+      });
     }
   );
 })();
