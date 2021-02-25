@@ -1,22 +1,8 @@
-import type { UserSignupPostReq, UserSqlAutoSave } from 'six__public-api';
+import type { UserPipeline } from 'six__public-api';
+
+export type { UserPipeline };
 
 /**
- * Properties needed for the User store insert operation
+ * User input email alias
  */
-export interface UserInsert {
-  /**
-   * ! Remove this before production
-   */
-  id: string;
-
-  username: UserSignupPostReq['req']['username'];
-  password: UserSignupPostReq['req']['password'];
-  email: UserSignupPostReq['req']['email'];
-  age: UserSignupPostReq['req']['age'];
-}
-
-export interface UserSqlAutoInsert {
-  id: UserSqlAutoSave['id'];
-}
-
-export type UserModel = UserInsert & UserSqlAutoInsert;
+export type UserEmail = UserPipeline['_insert']['Out']['email'];

@@ -1,5 +1,6 @@
 import type { Overwrite } from 'utility-types';
-import type { ColumnBuilder, CreateTableBuilder } from 'knex';
+import type { ColumnBuilder, CreateTableBuilder, Transaction } from 'knex';
+import type { DataNodeEssentials } from './sql-pipeline.types';
 
 /**
  * Defines the properties that need to be provided to Model during
@@ -46,7 +47,8 @@ type CustomTableBuilderMethods<T> = Overwrite<
        * Knex defines column names as strings, doesn't care wether the
        * model accepted as a generic contains the keys
        */
-      columnName: keyof T
+      columnName: keyof T,
+      options?: any
     ) => ColumnBuilder;
   }
 >;
@@ -59,3 +61,19 @@ type CustomTableBuilderMethods<T> = Overwrite<
 export type CustomTableBuilder<T> = (
   table: CustomTableBuilderMethods<T>
 ) => any;
+
+type PipelineEssentials = {
+  _insert: DataNodeEssentials;
+  _db: DataNodeEssentials;
+};
+
+export type BuildPrepareInsert<Pipeline extends PipelineEssentials> = {
+  insert: Pipeline['_insert']['Out'];
+  foreign: Pipeline['_insert']['Splits'];
+};
+
+export type BuildInsertParams<Pipeline extends PipelineEssentials> = [
+  Pipeline['_insert']['In'],
+  (keyof Pipeline['_db']['Out'])[],
+  Transaction
+];

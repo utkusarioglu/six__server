@@ -2,7 +2,7 @@ import mockKnex from 'mock-knex';
 import postgres from '../../connectors/postgres';
 mockKnex.mock(postgres);
 import commentStore from './comment';
-import { CommentModel } from './comment.types';
+import { CommentPipeline } from './comment.types';
 import { createTableCheck } from '../../helpers/tests';
 
 const tracker = mockKnex.getTracker();
@@ -27,8 +27,7 @@ describe(`
       if (query.sql.toUpperCase().startsWith('CREATE TABLE')) {
         queryHit++;
 
-        const columns: Omit<CommentModel, 'post_id'> = {
-          // post_id: '',
+        const columns: Omit<CommentPipeline['_db']['Out'], 'post_id'> = {
           parent_id: '',
           body: '',
           id: '',

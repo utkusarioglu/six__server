@@ -1,21 +1,12 @@
-import { uuid } from '../../@types/helpers';
-import type { CommentModel } from '../comment/comment.types';
-import type { VoteModel } from '../vote/vote.types';
+import { CommentVotePipeline } from 'six__public-api';
+import {
+  BuildInsertParams,
+  BuildPrepareInsert,
+} from '../model/types/model.types';
 
-/**
- * Defines the properties of a Comment Like that needs to be input
- * by the user
- */
+export type { CommentVotePipeline };
 
-export interface CommentVoteInsert {
-  /** Id of the user that sends the like command */
-  vote_id: VoteModel['id'];
-  /** Id of the comment on which the like is make */
-  comment_id: CommentModel['id'];
-}
+export type CommentVoteInsertParams = BuildInsertParams<CommentVotePipeline>;
 
-export interface CommentVoteInsertAuto {
-  id: uuid;
-}
-
-export type CommentVoteModel = CommentVoteInsert & CommentVoteInsertAuto;
+export type CommentVoteInput = CommentVotePipeline['_insert']['In'];
+export type CommentVotePrepareInsert = BuildPrepareInsert<CommentVotePipeline>;

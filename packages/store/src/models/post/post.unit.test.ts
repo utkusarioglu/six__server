@@ -2,16 +2,19 @@ import mockKnex from 'mock-knex';
 import postgres from '../../connectors/postgres';
 mockKnex.mock(postgres);
 import postStore from './post';
-import { PostInsert, PostModel } from './post.types';
+import {
+  PostPipeline,
+  PostPrepareInsert,
+  PostForCardSuccessBody,
+} from './post.types';
 import { createTableCheck, getSqlColumns } from '../../helpers/tests';
 import post from './post';
 import _ from 'lodash';
-import type { PostGetResInternal } from './post.types';
 import Chance from 'chance';
 
 const tracker = mockKnex.getTracker();
 const chance = Chance();
-const requestColumns: PostGetResInternal['res'] = {
+const requestColumns: PostForCardSuccessBody = {
   id: '',
   createdAt: '',
   postTitle: '',
@@ -47,17 +50,16 @@ describe(`
       if (query.sql.toUpperCase().startsWith('CREATE TABLE')) {
         queryHit++;
 
-        // @ts-ignore
-        const columns: PostModel = {
+        const columns: PostPipeline['_db']['Out'] = {
           id: '',
+          created_at: '',
           title: '',
           body: '',
           slug: '',
           dislike_count: 0,
           like_count: 0,
-          unique_commenter_count: 0,
           comment_count: 0,
-          created_at: '',
+          // cover_image_path: '',
         };
 
         createTableCheck(columns, query);
@@ -161,15 +163,16 @@ describe(`
     done();
   });
 
-  it.skip('Inserts post as expected', async (done) => {
+  it('Inserts post as expected', async (done) => {
     let queryHit = 0;
 
-    const postInsert: PostInsert = {
+    const postInsert: PostPrepareInsert['insert'] = {
       title: chance.sentence(),
       body: chance.paragraph(),
-      cover_image_path: chance.url(),
-      user_id: chance.guid(),
-      community_id: chance.guid(),
+      // cover_image_path: chance.url(),
+      // user_id: chance.guid(),
+      // community_id: chance.guid(),
+      slug: chance.word(),
     };
 
     tracker.on('query', (query) => {
@@ -177,12 +180,11 @@ describe(`
         queryHit++;
         console.log('hit');
       }
-      console.log(query.sql);
       query.response({ rows: [] });
     });
 
     await post.createTable();
-    await post.insert(postInsert);
+    await post._insert(postInsert);
     expect(queryHit).toBe(1);
 
     done();

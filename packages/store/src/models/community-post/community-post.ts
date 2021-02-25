@@ -1,14 +1,8 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import {
-  CommunityPostInsert,
-  CommunityPostModel,
-} from './community-post.types';
+import { CommunityPostPipeline } from './community-post.types';
 
-export class CommunityPostStore extends Model<
-  CommunityPostInsert,
-  CommunityPostModel
-> {
+export class CommunityPostStore extends Model<CommunityPostPipeline> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}

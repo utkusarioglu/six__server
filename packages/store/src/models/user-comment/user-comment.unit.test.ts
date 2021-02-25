@@ -2,7 +2,7 @@ import mockKnex from 'mock-knex';
 import postgres from '../../connectors/postgres';
 mockKnex.mock(postgres);
 import userCommentStore from './user-comment';
-import { UserCommentModel } from './user-comment.types';
+import { UserCommentPipeline } from './user-comment.types';
 import { createTableCheck } from '../../helpers/tests';
 
 const tracker = mockKnex.getTracker();
@@ -27,7 +27,7 @@ describe(`
       if (query.sql.toUpperCase().startsWith('CREATE TABLE')) {
         queryHit++;
 
-        const columns: UserCommentModel = {
+        const columns: UserCommentPipeline['_insert']['Out'] = {
           id: '',
           user_id: '',
           comment_id: '',

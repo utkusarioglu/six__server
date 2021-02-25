@@ -2,7 +2,7 @@ import mockKnex from 'mock-knex';
 import postgres from '../../connectors/postgres';
 mockKnex.mock(postgres);
 import userPostStore from './user-post';
-import { UserPostModel } from './user-post.types';
+import { UserPostPipeline } from './user-post.types';
 import { createTableCheck } from '../../helpers/tests';
 
 const tracker = mockKnex.getTracker();
@@ -27,7 +27,7 @@ describe(`
       if (query.sql.toUpperCase().startsWith('CREATE TABLE')) {
         queryHit++;
 
-        const columns: UserPostModel = {
+        const columns: UserPostPipeline['_db']['Out'] = {
           id: '',
           user_id: '',
           post_id: '',

@@ -1,11 +1,13 @@
-import { CommunityInsert } from 'six__server__store/src/models/community/community.types';
-import type { PostInsert } from 'six__server__store/src/models/post/post.types';
-import type { UserCommunitySubscriptionInsert } from 'six__server__store/src/models/user-community-subscription/user-community-subscription.types';
-import type { VisitorCommunitySubscriptionInsert } from 'six__server__store/src/models/visitor-community-subscription/visitor-community-subscription.types';
-import type { UserInsert } from 'six__server__store/src/models/user/user.types';
-import { UserContentInsert } from 'six__server__store/src/models/user-content/user-content.types';
+import { CommunityPipeline } from 'six__server__store/src/models/community/community.types';
+import type { PostPipeline } from 'six__server__store/src/models/post/post.types';
+import type { UserCommunitySubscriptionPipeline } from 'six__server__store/src/models/user-community-subscription/user-community-subscription.types';
+import type { VisitorCommunitySubscriptionPipeline } from 'six__server__store/src/models/visitor-community-subscription/visitor-community-subscription.types';
+import type { UserPipeline } from 'six__server__store/src/models/user/user.types';
+import { UserContentPipeline } from 'six__server__store/src/models/user-content/user-content.types';
 
-export const USERS: UserInsert[] = [
+export const USERS: (UserPipeline['_insert']['Out'] & {
+  id: string;
+})[] = [
   {
     id: 'fced7bf2-fa80-46fe-b83b-0cae45ca5db0',
     username: 'utkusarioglu',
@@ -29,7 +31,9 @@ export const USERS: UserInsert[] = [
   },
 ];
 
-export const COMMUNITIES: CommunityInsert[] = [
+export const COMMUNITIES: (CommunityPipeline['_insert']['Out'] & {
+  id: string;
+})[] = [
   {
     id: 'ac6acb36-a2c4-4c32-b9c3-22143e4d133d',
     name: 'NuclearPatients',
@@ -51,50 +55,55 @@ export const COMMUNITIES: CommunityInsert[] = [
   },
 ];
 
-export const POSTS: PostInsert[] = [
+export const POSTS: PostPipeline['_store']['In'][] = [
   {
     title: "utku's first post",
     body: 'This is the body of my first post',
-    user_id: 'fced7bf2-fa80-46fe-b83b-0cae45ca5db0',
-    community_id: 'ac6acb36-a2c4-4c32-b9c3-22143e4d133d',
+    userId: 'fced7bf2-fa80-46fe-b83b-0cae45ca5db0',
+    communityId: 'ac6acb36-a2c4-4c32-b9c3-22143e4d133d',
+    mediaImagePath: '',
   },
   {
     title: 'I like rabbits more than ducks',
     body: `I have been thinking about this for a long time and at this point, I'm entirely sure that ducks suck and rabbits rule. Think about it. All that rabbits do is to advance the neo-con ideals and the domination of bees over the asia-pacific region. Thanks to you guys and all the awesome work we have done in this community, I see everything clearly now.`,
-    user_id: 'fced7bf2-fa80-46fe-b83b-0cae45ca5db0',
-    community_id: '268944e3-55a3-4361-967c-c17f530a660b',
+    userId: 'fced7bf2-fa80-46fe-b83b-0cae45ca5db0',
+    communityId: '268944e3-55a3-4361-967c-c17f530a660b',
+    mediaImagePath: '',
   },
   {
     title: 'ducks are simply better than rabbits',
     body: 'This is the body of my first post',
-    user_id: 'fced7bf2-fa80-46fe-b83b-0cae45ca5db0',
-    community_id: '1bf52c83-a131-4322-9968-31711049c925',
+    userId: 'fced7bf2-fa80-46fe-b83b-0cae45ca5db0',
+    communityId: '1bf52c83-a131-4322-9968-31711049c925',
+    mediaImagePath: '',
   },
 
   {
     title: 'I recently became a nuclear patient',
     body: 'Help me understand whats going on please, this is so weird',
-    user_id: '6cfb8fe7-074e-4cd5-ba38-bf1cceaf0dd6',
-    community_id: 'ac6acb36-a2c4-4c32-b9c3-22143e4d133d',
+    userId: '6cfb8fe7-074e-4cd5-ba38-bf1cceaf0dd6',
+    communityId: 'ac6acb36-a2c4-4c32-b9c3-22143e4d133d',
+    mediaImagePath: '',
   },
   {
     title: "I don't understand the fascination with rabbits",
     body:
       "I have been reading the posts here and I have to admit that I don't understand the fascination you guys have with rabbits",
-    user_id: '6cfb8fe7-074e-4cd5-ba38-bf1cceaf0dd6',
-    community_id: '268944e3-55a3-4361-967c-c17f530a660b',
-    cover_image_path: '1.jpg',
+    userId: '6cfb8fe7-074e-4cd5-ba38-bf1cceaf0dd6',
+    communityId: '268944e3-55a3-4361-967c-c17f530a660b',
+    mediaImagePath: '1.jpg',
   },
   {
     title: 'I feel like no one knows my name anymore',
     body:
       "I have been a patient for a long time. But I still get these confused looks when people say my name. And they always act like I'm a random person when I'm in hospitals",
-    user_id: '15ffc829-6767-4dbe-86bb-b7303cba06a5',
-    community_id: 'ac6acb36-a2c4-4c32-b9c3-22143e4d133d',
+    userId: '15ffc829-6767-4dbe-86bb-b7303cba06a5',
+    communityId: 'ac6acb36-a2c4-4c32-b9c3-22143e4d133d',
+    mediaImagePath: '',
   },
 ];
 
-export const VISITOR_COMMUNITIES: VisitorCommunitySubscriptionInsert[] = [
+export const VISITOR_COMMUNITIES: VisitorCommunitySubscriptionPipeline['_insert']['Out'][] = [
   {
     community_id: '268944e3-55a3-4361-967c-c17f530a660b',
   },
@@ -103,14 +112,14 @@ export const VISITOR_COMMUNITIES: VisitorCommunitySubscriptionInsert[] = [
   },
 ];
 
-export const USER_COMMUNITY_SUBSCRIPTIONS: UserCommunitySubscriptionInsert[] = [
+export const USER_COMMUNITY_SUBSCRIPTIONS: UserCommunitySubscriptionPipeline['_insert']['Out'][] = [
   {
     user_id: USERS[0].id!,
     community_id: COMMUNITIES[0].id!,
   },
 ];
 
-export const USER_CONTENTS: UserContentInsert[] = [
+export const USER_CONTENTS: UserContentPipeline['_insert']['In'][] = [
   {
     filename: '1.jpg',
     type: 'image/jpg',

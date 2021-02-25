@@ -2,12 +2,13 @@ import { uuid } from '../../@types/helpers';
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
 import {
-  CommentInsert,
-  CommentModel,
   CommentsForPostSlug,
+  CommentInput,
+  CommentPrepareInsert,
+  CommentPipeline,
 } from './comment.types';
 
-export class CommentStore extends Model<CommentInsert, CommentModel> {
+export class CommentStore extends Model<CommentPipeline> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}
@@ -36,9 +37,30 @@ export class CommentStore extends Model<CommentInsert, CommentModel> {
     });
   }
 
-  async insert(commentInsert: CommentInsert) {
-    const { post_id, parent_id, body, user_id } = commentInsert;
-    const comment = { parent_id, body };
+  private prepareInsert({
+    parentId,
+    body,
+    userId,
+    postId,
+  }: CommentInput): CommentPrepareInsert {
+    return {
+      insert: {
+        parent_id: parentId,
+        body,
+      },
+      foreign: {
+        user_id: userId,
+        post_id: postId,
+      },
+    };
+  }
+
+  async insert(commentInput: CommentInput) {
+    const {
+      insert: commentInsert,
+      foreign: { user_id, post_id },
+    } = this.prepareInsert(commentInput);
+
     let comment_id: uuid; // this will be created by the db
 
     return this._getConnector().transaction(async (associations) => {
@@ -57,7 +79,7 @@ export class CommentStore extends Model<CommentInsert, CommentModel> {
         // save the comment
         await postgres('comments')
           .transacting(entities)
-          .insert(comment, ['id'])
+          .insert(commentInsert, ['id'])
           .then((returns) => (comment_id = returns[0].id))
           .catch(rollbackEntities);
 
@@ -92,7 +114,7 @@ export class CommentStore extends Model<CommentInsert, CommentModel> {
   // !shouldn't be post slug, this is connected data
   async selectByPostSlug(postSlug: string) {
     console.log('comments fro post slug:', postSlug);
-    const mockComments: CommentsForPostSlug = [
+    const mockComments: CommentsForPostSlug[] = [
       {
         id: 'id',
         postSlug: 'i-like-rabbits-more-than-ducks',
@@ -102,6 +124,8 @@ export class CommentStore extends Model<CommentInsert, CommentModel> {
         likeCount: 1,
         dislikeCount: 1,
         creatorUsername: 'MassiveHuman_yes',
+        userId: '',
+        postId: '',
       },
       {
         id: 'id2',
@@ -112,6 +136,8 @@ export class CommentStore extends Model<CommentInsert, CommentModel> {
         likeCount: 1,
         dislikeCount: 1,
         creatorUsername: 'iLikeSomeBanana321',
+        userId: '',
+        postId: '',
       },
       {
         id: 'id3',
@@ -122,6 +148,8 @@ export class CommentStore extends Model<CommentInsert, CommentModel> {
         likeCount: 1,
         dislikeCount: 1,
         creatorUsername: 'iLikeSomeBanana321',
+        userId: '',
+        postId: '',
       },
       {
         id: 'id4',
@@ -133,6 +161,8 @@ export class CommentStore extends Model<CommentInsert, CommentModel> {
         likeCount: 1,
         dislikeCount: 1,
         creatorUsername: 'no_more1usernames!',
+        userId: '',
+        postId: '',
       },
     ];
 

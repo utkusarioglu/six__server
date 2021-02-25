@@ -11,17 +11,17 @@ import { NODE_ENV } from 'six__server__global';
 
 async function mockUsers(): Promise<void> {
   await store.user.deleteAll();
-  await store.user.insert(USERS);
+  await store.user._insert(USERS);
 }
 
 async function mockCommunities(): Promise<void> {
   await store.community.deleteAll();
-  await store.community.insert(COMMUNITIES);
+  await store.community._insert(COMMUNITIES);
 
   await store.visitorCommunitySubscription.deleteAll();
-  await store.visitorCommunitySubscription.insert(VISITOR_COMMUNITIES);
+  await store.visitorCommunitySubscription._insert(VISITOR_COMMUNITIES);
 
-  await store.userCommunitySubscription.insert(USER_COMMUNITY_SUBSCRIPTIONS);
+  await store.userCommunitySubscription._insert(USER_COMMUNITY_SUBSCRIPTIONS);
 }
 
 async function mockComments() {
@@ -34,7 +34,7 @@ async function mockVotes() {
 
 async function mockUserContents() {
   await store.userContent.deleteAll();
-  await store.userContent.insert(USER_CONTENTS);
+  await store.userContent._insert(USER_CONTENTS);
 }
 
 /**
@@ -49,20 +49,6 @@ async function mockPosts(): Promise<void> {
     });
     return chain;
   }, Promise.resolve());
-}
-
-/***
- * Clears n-ary associations from the store
- */
-async function clearNaryAssociations() {
-  await store.commentVote.deleteAll();
-  await store.communityPost.deleteAll();
-  await store.postVote.deleteAll();
-  await store.userComment.deleteAll();
-  await store.userCommunityCreator.createTable();
-  await store.userCommunitySubscription.deleteAll();
-  await store.userPost.deleteAll();
-  await store.userVote.deleteAll();
 }
 
 /**

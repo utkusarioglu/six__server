@@ -2,13 +2,14 @@ import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
 import _ from 'lodash';
 import {
-  PostInsert,
-  PostInsertComputed,
-  PostModel,
-  PostGetResInternal,
+  PostPipeline,
+  PostSlug,
+  PostInput,
+  PostPrepareInsert,
 } from './post.types';
+import store from 'six__server__store';
 
-export class PostStore extends Model<PostInsert, PostModel> {
+export class PostStore extends Model<PostPipeline> {
   /**
    * Columns used in selecting for building the posts wall for users and
    * visitors
@@ -48,8 +49,6 @@ export class PostStore extends Model<PostInsert, PostModel> {
       table.uuid('id').primary().defaultTo(this._raw('uuid_generate_v4()'));
       table.timestamp('created_at').defaultTo(this._now());
       table.string('title').notNullable();
-      // TODO model typing does not recognize this kind of use in text
-      // @ts-ignore
       table.text('body', ['longtext']).notNullable();
       table.string('slug').notNullable();
       table.integer('dislike_count').defaultTo(0);
@@ -60,7 +59,6 @@ export class PostStore extends Model<PostInsert, PostModel> {
        */
       table.integer('like_count').defaultTo(1);
       table.integer('comment_count').defaultTo(0);
-      table.string('unique_commenter_count').defaultTo(0);
     });
   }
 
@@ -81,9 +79,6 @@ export class PostStore extends Model<PostInsert, PostModel> {
 
   /**
    * Selects the posts that the visitors see
-   *
-   * @remarks
-   *
    */
   async selectVisitorPosts() {
     return this._queryBuilder((table) => {
@@ -108,7 +103,7 @@ export class PostStore extends Model<PostInsert, PostModel> {
    *
    * @param postSlug slug for the post to be returned
    */
-  async selectPostBySlug(postSlug: PostGetResInternal['res']['postSlug']) {
+  async selectPostBySlug(postSlug: PostSlug) {
     return this._queryBuilder((table) => {
       return table
         .select(this._post_columns)
@@ -125,12 +120,27 @@ export class PostStore extends Model<PostInsert, PostModel> {
   /**
    * Includes the auto-created values for the post insertion
    *
-   * @param postInsert post insert values from user input
+   * @param postInput post insert values from user input
    */
-  private prepareInsert(postInsert: PostInsert): PostInsertComputed {
+  private prepareInsert({
+    title,
+    body,
+    userId,
+    communityId,
+    mediaImagePath,
+  }: PostInput): PostPrepareInsert {
     return {
-      ...postInsert,
-      slug: _.kebabCase(postInsert.title),
+      insert: {
+        title,
+        body,
+        slug: _.kebabCase(title),
+      },
+      foreign: {
+        user_id: userId,
+        community_id: communityId,
+        cover_image_path: mediaImagePath,
+        type: mediaImagePath !== '' ? 'image/jpeg' : '',
+      },
     };
   }
 
@@ -139,7 +149,7 @@ export class PostStore extends Model<PostInsert, PostModel> {
    * Inserts into posts, votes along with the post's related user, community,
    * vote associations
    *
-   * @param postInsert defined by {@link PostInsert}, contains post data as well
+   * @param postInput defined by {@link PostInsert}, contains post data as well
    * as community_id and user_id
    *
    * @privateRemarks
@@ -148,11 +158,11 @@ export class PostStore extends Model<PostInsert, PostModel> {
    * a method for managing transactions, this method will have to be written
    * again
    */
-  async insert(postInsert: PostInsert) {
-    postInsert = this.prepareInsert(postInsert);
-    const { community_id, user_id, cover_image_path } = postInsert;
-    const post = _.pick(postInsert, 'title', 'body', 'slug');
-    const type = 'image/jpeg';
+  async insert(postInput: PostInput) {
+    const {
+      insert: post,
+      foreign: { community_id, cover_image_path, user_id, type },
+    } = this.prepareInsert(postInput);
 
     /** these will be created as the transactions run */
     let post_id: string; // uuid
@@ -249,6 +259,52 @@ export class PostStore extends Model<PostInsert, PostModel> {
               })
               .catch(rollbackAssociations);
           }
+        })
+    );
+  }
+
+  /**
+   * @override
+   * Inserts into posts, votes along with the post's related user, community,
+   * vote associations
+   *
+   * @param postInsert defined by {@link PostInsert}, contains post data as well
+   * as community_id and user_id
+   *
+   * @privateRemarks
+   * This method cannot use the typical pattern of using the query builder as
+   * it contains transactions. If the {@link Model} class ever receives
+   * a method for managing transactions, this method will have to be written
+   * again
+   */
+  async insert3(postInsert: PostInput) {
+    const {
+      insert: post,
+      foreign: { community_id, cover_image_path, user_id, type },
+    } = this.prepareInsert(postInsert);
+
+    /** these will be created as the transactions run */
+    let post_id: string; // uuid
+    let vote_id: string; // uuid
+    let user_content_id: string; // uuid
+
+    return (
+      this._getConnector()
+        /** Transaction for handling associations and entities */
+        .transaction(async (transaction) => {
+          const post_id = await this._insert(post, ['id'], transaction).then(
+            (row) => row && row[0].id
+          );
+
+          console.log('post_id', post_id);
+
+          const vote = await store.vote.insert(
+            { voteType: 1 },
+            ['id'],
+            transaction
+          );
+
+          console.log('vote', vote);
         })
     );
   }

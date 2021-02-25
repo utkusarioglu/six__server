@@ -1,7 +1,11 @@
 import type Knex from 'knex';
 import { NODE_ENV } from 'six__server__global';
-import { ModelProps, CustomTableBuilder } from './model.types';
+import { ModelProps, CustomTableBuilder } from './types/model.types';
 import { ERROR_MESSAGES } from './model.constants';
+import type {
+  DefaultSqlPipeline,
+  PipelineEssentials,
+} from './types/sql-pipeline.types';
 import _ from 'lodash';
 
 /**
@@ -10,7 +14,7 @@ import _ from 'lodash';
  * access to their respective databases
  *
  */
-export abstract class Model<InstanceInsert, InstanceModel> {
+export abstract class Model<Pipeline extends PipelineEssentials> {
   private _tableCreateCalled: boolean = false;
 
   /** singular name for the entity */
@@ -21,11 +25,10 @@ export abstract class Model<InstanceInsert, InstanceModel> {
 
   // TODO this type doesn't work, errors are disabled with ts-ignore
   /** database connector built by {@link Knex} */
-  protected _db: Knex<InstanceInsert, InstanceModel[]>;
+  protected _db: Knex<Pipeline['_db']['Out'], Pipeline['_db']['Out'][]>;
 
   /** Shorthand for knex.schema */
   private _schema: Knex.SchemaBuilder;
-  private static _testTablePrefix = 'test_';
 
   /**
    * Instantiates the Model abstract class
@@ -99,7 +102,7 @@ export abstract class Model<InstanceInsert, InstanceModel> {
    * table. This may cause issues if it's not accounted for.
    */
   protected async _createTable(
-    tableBuilder: CustomTableBuilder<InstanceModel>
+    tableBuilder: CustomTableBuilder<Pipeline['_db']['Out']>
   ) {
     this._tableCreateCalled = true;
     if (await this._schema.hasTable(this._plural)) return;
@@ -150,7 +153,7 @@ export abstract class Model<InstanceInsert, InstanceModel> {
   /**
    * Selects all the entries in the respective table
    */
-  async selectAll(): Promise<InstanceModel[] | void> {
+  async selectAll(): Promise<Pipeline['_db']['Out'][] | void> {
     // @ts-ignore
     return this._getTable().select('*').catch(this._errorHandler);
   }
@@ -177,9 +180,30 @@ export abstract class Model<InstanceInsert, InstanceModel> {
    * @param inserts data to be inserted, defined by the Insert generic type
    * defined by the particular instance
    */
-  async insert(inserts: InstanceInsert | InstanceInsert[]) {
-    // @ts-ignore
-    return this._getTable().insert(inserts).catch(this._errorHandler);
+  async _insert(
+    inserts: Pipeline['_insert']['Out'] | Pipeline['_insert']['Out'][],
+    returns?: (keyof Pipeline['_db']['Out'])[],
+    transaction?: Knex.Transaction
+  ) {
+    if (transaction) {
+      return (
+        this._getTable()
+          .transacting(transaction)
+          // @ts-ignore
+          .insert(inserts, returns)
+          .catch((e) => {
+            transaction.rollback();
+            this._errorHandler(e);
+          })
+      );
+    } else {
+      return (
+        this._getTable()
+          // @ts-ignore
+          .insert(inserts, returns)
+          .catch(this._errorHandler)
+      );
+    }
   }
 
   /**
@@ -233,7 +257,7 @@ export abstract class Model<InstanceInsert, InstanceModel> {
    * property. Or the consumer can define a custom string using "as".
    */
   protected _col2(
-    columnName: keyof InstanceModel,
+    columnName: keyof Pipeline['_insert']['Out'],
     alterations: {
       as?: string;
       pre?: string;

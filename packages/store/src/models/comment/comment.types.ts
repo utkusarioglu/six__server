@@ -1,36 +1,11 @@
-import type {
-  CommentSqlAutoSave,
-  CommentSavePostReq,
-  CommentsGetRes,
-} from 'six__public-api';
+import type { CommentPipeline, CommentEndpoint } from 'six__public-api';
+import { BuildPrepareInsert } from '../model/types/model.types';
 
-/**
- * Defines the properties of comment that needs to come from
- * user input
- */
-export interface CommentInsert {
-  post_id: CommentSavePostReq['req']['postId'];
-  user_id: CommentSavePostReq['req']['userId'];
-  parent_id: CommentSavePostReq['req']['parentId'];
-  body: CommentSavePostReq['req']['body'];
-}
-
-/**
- * Values of comment model that are filled by the database
- */
-export interface CommentInsertAuto {
-  id: CommentSqlAutoSave['id']; // uuid
-  created_at: CommentSqlAutoSave['createdAt']; // iso date
-  like_count: CommentSqlAutoSave['likeCount']; // uint
-  dislike_count: CommentSqlAutoSave['dislikeCount']; // uint
-}
-
-/**
- * Shape of comment table rows
- */
-export type CommentModel = CommentInsertAuto & CommentInsert;
+export type { CommentPipeline };
+export type CommentInput = CommentPipeline['_insert']['In'];
+export type CommentPrepareInsert = BuildPrepareInsert<CommentPipeline>;
 
 /**
  * Shape of return when Comments for a particular post is being returned
  */
-export type CommentsForPostSlug = CommentsGetRes['res'];
+export type CommentsForPostSlug = CommentEndpoint['_single']['_v1']['_get']['_res']['Success']['body'];

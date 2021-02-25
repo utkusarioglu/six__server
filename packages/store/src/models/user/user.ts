@@ -1,9 +1,8 @@
 import postgres from '../../connectors/postgres';
-// import type { User } from 'six__server__auth/src/@types/user';
 import { Model } from '../model/model';
-import { UserInsert, UserModel } from './user.types';
+import { UserPipeline, UserEmail } from './user.types';
 
-export class UserStore extends Model<UserInsert, UserModel> {
+export class UserStore extends Model<UserPipeline> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}
@@ -31,10 +30,9 @@ export class UserStore extends Model<UserInsert, UserModel> {
    * @returns false if there is no match, also false if there are somehow more
    * than one matches. It returns the user {@link User} if there is only one match
    */
-  async selectByEmail(email: string): Promise<Express.User | false> {
+  async selectByEmail(email: UserEmail): Promise<Express.User | false> {
     return this._queryBuilder((table) => {
       return table.where({ email }).then((user) => {
-        console.log('store user', user);
         if (user.length !== 1) {
           return Promise.resolve(false);
         }

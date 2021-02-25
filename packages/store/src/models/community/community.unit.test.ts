@@ -2,7 +2,7 @@ import mockKnex from 'mock-knex';
 import postgres from '../../connectors/postgres';
 mockKnex.mock(postgres);
 import communityStore from './community';
-import { CommunityModel } from './community.types';
+import { CommunityPipeline } from './community.types';
 import { createTableCheck } from '../../helpers/tests';
 
 const tracker = mockKnex.getTracker();
@@ -27,7 +27,7 @@ describe(`
       if (query.sql.toUpperCase().startsWith('CREATE TABLE')) {
         queryHit++;
 
-        const columns: CommunityModel = {
+        const columns: CommunityPipeline['_db']['Out'] = {
           id: '',
           description: '',
           name: '',

@@ -1,11 +1,15 @@
 import postgres from '../../connectors/postgres';
-import { CommentVoteInsert, CommentVoteModel } from './comment-vote.types';
+import {
+  CommentVotePipeline,
+  CommentVotePrepareInsert,
+  CommentVoteInput,
+  // CommentVoteReturnRows,
+  CommentVoteInsertParams,
+} from './comment-vote.types';
 import { Model } from '../model/model';
+import Knex from 'knex';
 
-export class CommentVoteStore extends Model<
-  CommentVoteInsert,
-  CommentVoteModel
-> {
+export class CommentVoteStore extends Model<CommentVotePipeline> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}
@@ -33,6 +37,24 @@ export class CommentVoteStore extends Model<
         .onDelete('CASCADE')
         .onUpdate('CASCADE');
     });
+  }
+
+  private prepareInsert({
+    voteId,
+    commentId,
+  }: CommentVoteInput): CommentVotePrepareInsert {
+    return {
+      insert: {
+        vote_id: voteId,
+        comment_id: commentId,
+      },
+      foreign: {},
+    };
+  }
+
+  async insert(...[input, returns, transaction]: CommentVoteInsertParams) {
+    const { insert } = this.prepareInsert(input);
+    return this._insert(insert, returns, transaction);
   }
 }
 

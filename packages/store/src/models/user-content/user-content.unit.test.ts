@@ -2,7 +2,7 @@ import mockKnex from 'mock-knex';
 import postgres from '../../connectors/postgres';
 mockKnex.mock(postgres);
 import userContentStore from './user-content';
-import { UserContentModel } from './user-content.types';
+import { UserContentPipeline } from './user-content.types';
 import { createTableCheck } from '../../helpers/tests';
 
 const tracker = mockKnex.getTracker();
@@ -27,7 +27,7 @@ describe(`
       if (query.sql.toUpperCase().startsWith('CREATE TABLE')) {
         queryHit++;
 
-        const columns: UserContentModel = {
+        const columns: UserContentPipeline['_db']['Out'] = {
           id: '',
           filename: '',
           type: '',

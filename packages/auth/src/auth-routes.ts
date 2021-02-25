@@ -9,21 +9,22 @@ import {
 } from './validation/validation';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import type { UserInsert } from 'six__server__store/src/models/user/user.types';
-import type { User } from 'six__public-api';
+import type { UserSqlInsert } from 'six__server__store/src/models/user/user.types';
+import type { UserEndpoint } from 'six__public-api';
 import { validateEndpoint } from './helpers';
 
 const router = express.Router();
 
 router.get<
-  User['Session']['v1']['Get']['Req']['Params'],
-  User['Session']['v1']['Get']['Res']['Union']
+  UserEndpoint['Session']['v1']['Get']['Req']['Params'],
+  UserEndpoint['Session']['v1']['Get']['Res']['Union']
 >(
-  validateEndpoint<User['Session']['v1']['Endpoint']>('/session/v1/:requestId'),
+  validateEndpoint<UserEndpoint['Session']['v1']['Endpoint']>(
+    '/session/v1/:requestId'
+  ),
   (req, res) => {
     const { requestId } = req.params;
 
-    console.log(req.user);
     // if there is no user session
     if (!req.user) {
       const sessionInfo = {
@@ -58,11 +59,13 @@ router.get<
 );
 
 router.post<
-  User['Login']['v1']['Post']['Req']['Params'],
-  User['Login']['v1']['Post']['Res']['Union'],
-  User['Login']['v1']['Post']['Req']['Body']
+  UserEndpoint['Login']['v1']['Post']['Req']['Params'],
+  UserEndpoint['Login']['v1']['Post']['Res']['Union'],
+  UserEndpoint['Login']['v1']['Post']['Req']['Body']
 >(
-  validateEndpoint<User['Login']['v1']['Endpoint']>('/login/v1/:requestId'),
+  validateEndpoint<UserEndpoint['Login']['v1']['Endpoint']>(
+    '/login/v1/:requestId'
+  ),
   (req, res, next) => {
     const { requestId } = req.params;
 
@@ -119,11 +122,13 @@ router.post<
 );
 
 router.post<
-  User['Logout']['v1']['Post']['Req']['Params'],
-  User['Logout']['v1']['Post']['Res']['Union'],
-  User['Logout']['v1']['Post']['Req']['Body']
+  UserEndpoint['Logout']['v1']['Post']['Req']['Params'],
+  UserEndpoint['Logout']['v1']['Post']['Res']['Union'],
+  UserEndpoint['Logout']['v1']['Post']['Req']['Body']
 >(
-  validateEndpoint<User['Logout']['v1']['Endpoint']>('/logout/v1/:requestId'),
+  validateEndpoint<UserEndpoint['Logout']['v1']['Endpoint']>(
+    '/logout/v1/:requestId'
+  ),
   async (req, res) => {
     const { requestId } = req.params;
 
@@ -146,15 +151,19 @@ router.post<
 );
 
 router.post<
-  User['Signup']['v1']['Post']['Req']['Params'],
-  User['Signup']['v1']['Post']['Res']['Union'],
-  User['Signup']['v1']['Post']['Req']['Body']
+  UserEndpoint['Signup']['v1']['Post']['Req']['Params'],
+  UserEndpoint['Signup']['v1']['Post']['Res']['Union'],
+  UserEndpoint['Signup']['v1']['Post']['Req']['Body']
 >(
-  validateEndpoint<User['Signup']['v1']['Endpoint']>('/signup/v1/:requestId'),
+  validateEndpoint<UserEndpoint['Signup']['v1']['Endpoint']>(
+    '/signup/v1/:requestId'
+  ),
   async (req, res, next) => {
     const { requestId } = req.params;
     const { username, password, email, age } = req.body;
-    const errors: Partial<User['Signup']['v1']['Post']['Req']['Body']> = {};
+    const errors: Partial<
+      UserEndpoint['Signup']['v1']['Post']['Req']['Body']
+    > = {};
 
     if (!passwordLengthValid(password)) {
       errors.password = 'PASSWORD_LENGTH_ILLEGAL';
@@ -203,14 +212,14 @@ router.post<
         bcrypt
           .hash(password, 10)
           .then((passwordHashed) => {
-            const userModel: UserInsert = {
+            const userModel: UserSqlInsert = {
               id: uuidv4(),
               username,
               password: passwordHashed,
               email,
               age,
             };
-            store.user.insert(userModel).then(() => {
+            store.user._insert(userModel).then(() => {
               const userLogin = {
                 id: userModel.id,
                 username: userModel.username,

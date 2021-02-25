@@ -93,7 +93,7 @@ describe(`
         Error(ERROR_MESSAGES.PREMATURE_TABLE_CALL)
       );
 
-      expect(mockStore.insert.bind(mockStore)).rejects.toEqual(
+      expect(mockStore._insert.bind(mockStore)).rejects.toEqual(
         Error(ERROR_MESSAGES.PREMATURE_TABLE_CALL)
       );
 
@@ -212,7 +212,7 @@ describe(`
       });
 
       await mockStore.createTable();
-      await mockStore.insert(insertion);
+      await mockStore._insert(insertion);
       expect(queryHit).toBe(1);
       done();
     });
@@ -252,7 +252,7 @@ describe(`
       });
 
       await mockStore.createTable();
-      await mockStore.insert(insertions);
+      await mockStore._insert(insertions);
       expect(queryHit).toBe(1);
 
       done();

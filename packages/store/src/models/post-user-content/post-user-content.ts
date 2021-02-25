@@ -1,17 +1,11 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import {
-  PostUserContentInsert,
-  PostUserContentModel,
-} from './post-user-content.types';
+import { PostUserContentPipeline } from './post-user-content.types';
 
 /**
  * Association table for connecting posts with user content (uploaded files)
  */
-export class PostUserContentStore extends Model<
-  PostUserContentInsert,
-  PostUserContentModel
-> {
+export class PostUserContentStore extends Model<PostUserContentPipeline> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}

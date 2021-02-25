@@ -24,9 +24,9 @@
     "start:watcher": "nodemon",
     "start:watch": "$(yarn bin)/lerna run --parallel start:watch",
     "clean": "lerna run --parallel clean",
+    "test": "docker exec -it six__server bash -c 'NODE_ENV=test $(yarn bin)/jest --watch'",
     "test:inside-container": "$(yarn bin)/jest",
     "test:ci": "$(yarn bin)/jest test --coverage --no-watchman a",
-    "test": "docker exec -it six__server bash -c 'NODE_ENV=test $(yarn bin)/jest'",
     "bash": "docker exec -it six__server bash"
   }
 }

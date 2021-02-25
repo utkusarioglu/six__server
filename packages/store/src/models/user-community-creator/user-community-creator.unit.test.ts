@@ -2,7 +2,7 @@ import mockKnex from 'mock-knex';
 import postgres from '../../connectors/postgres';
 mockKnex.mock(postgres);
 import userCommunityCreatorStore from './user-community-creator';
-import { UserCommunityCreatorModel } from './user-community-creator.types';
+import { UserCommunityCreatorPipeline } from './user-community-creator.types';
 import { createTableCheck } from '../../helpers/tests';
 
 const tracker = mockKnex.getTracker();
@@ -27,7 +27,7 @@ describe(`
       if (query.sql.toUpperCase().startsWith('CREATE TABLE')) {
         queryHit++;
 
-        const columns: UserCommunityCreatorModel = {
+        const columns: UserCommunityCreatorPipeline['_db']['Out'] = {
           id: '',
           user_id: '',
           community_id: '',

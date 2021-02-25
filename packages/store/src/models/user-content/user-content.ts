@@ -1,14 +1,16 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import type { UserContentInsert, UserContentModel } from './user-content.types';
+import type {
+  UserContentPipeline,
+  UserContentInput,
+  UserContentPrepareInsert,
+  UserContentInsertFunc,
+} from './user-content.types';
 
 /**
  * Represents uploaded user content
  */
-export class UserContentStore extends Model<
-  UserContentInsert,
-  UserContentModel
-> {
+export class UserContentStore extends Model<UserContentPipeline> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}
@@ -25,6 +27,24 @@ export class UserContentStore extends Model<
       table.string('filename');
       table.string('type'); // maybe there is a mime type option for this
     });
+  }
+
+  private prepareInsert({
+    filename,
+    type,
+  }: UserContentInput): UserContentPrepareInsert {
+    return {
+      insert: {
+        filename,
+        type,
+      },
+      foreign: {},
+    };
+  }
+
+  insert(...[input, returns, transaction]: UserContentInsertFunc) {
+    const { insert } = this.prepareInsert(input);
+    return this._insert(insert, returns, transaction);
   }
 }
 

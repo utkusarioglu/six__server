@@ -1,14 +1,8 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import {
-  UserCommunitySubscriptionInsert,
-  UserCommunitySubscriptionModel,
-} from './user-community-subscription.types';
+import { UserCommunitySubscriptionPipeline } from './user-community-subscription.types';
 
-export class UserCommunitySubscriptionStore extends Model<
-  UserCommunitySubscriptionInsert,
-  UserCommunitySubscriptionModel
-> {
+export class UserCommunitySubscriptionStore extends Model<UserCommunitySubscriptionPipeline> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}

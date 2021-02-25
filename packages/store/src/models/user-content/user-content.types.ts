@@ -1,12 +1,11 @@
-import { uuid } from '../../@types/helpers';
+import type { UserContentPipeline } from 'six__public-api';
+import {
+  BuildInsertParams,
+  BuildPrepareInsert,
+} from '../model/types/model.types';
 
-export interface UserContentInsert {
-  filename: string; // path
-  type: string; // mime type
-}
+export type { UserContentPipeline };
 
-export interface UserContentSqlAutoInsert {
-  id: uuid;
-}
-
-export type UserContentModel = UserContentInsert & UserContentSqlAutoInsert;
+export type UserContentInput = UserContentPipeline['_insert']['In'];
+export type UserContentPrepareInsert = BuildPrepareInsert<UserContentPipeline>;
+export type UserContentInsertFunc = BuildInsertParams<UserContentPipeline>;

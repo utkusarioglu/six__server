@@ -1,23 +1,11 @@
-import type {
-  PostVotePostReq,
-  VoteSqlAutoSave,
-  CommentVotePostReq,
-} from 'six__public-api';
+import type { VotePipeline } from 'six__public-api';
+import {
+  BuildInsertParams,
+  BuildPrepareInsert,
+} from '../model/types/model.types';
 
-/**
- * Defines the properties that need to be supplied by the user to insert a
- * vote to votes
- */
+export type { VotePipeline };
 
-export interface VoteInsert {
-  vote_type:
-    | PostVotePostReq['req']['voteType']
-    | CommentVotePostReq['req']['voteType'];
-}
-
-export interface VoteInsertAuto {
-  id: VoteSqlAutoSave['id'];
-  created_at: VoteSqlAutoSave['createdAt'];
-}
-
-export type VoteModel = VoteInsert & VoteInsertAuto;
+export type VoteInput = VotePipeline['_insert']['In'];
+export type VoteInsertParams = BuildInsertParams<VotePipeline>;
+export type VotePrepareInsert = BuildPrepareInsert<VotePipeline>;

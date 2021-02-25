@@ -2,7 +2,7 @@ import mockKnex from 'mock-knex';
 import postgres from '../../connectors/postgres';
 mockKnex.mock(postgres);
 import voteStore from './vote';
-import { VoteModel } from './vote.types';
+import { VotePipeline } from './vote.types';
 import { createTableCheck } from '../../helpers/tests';
 
 const tracker = mockKnex.getTracker();
@@ -27,9 +27,9 @@ describe(`
       if (query.sql.toUpperCase().startsWith('CREATE TABLE')) {
         queryHit++;
 
-        const columns: VoteModel = {
+        const columns: VotePipeline['_db']['Out'] = {
           id: '',
-          created_at: 0,
+          created_at: '',
           vote_type: -1,
         };
 

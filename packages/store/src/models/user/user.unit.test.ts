@@ -2,7 +2,7 @@ import mockKnex from 'mock-knex';
 import postgres from '../../connectors/postgres';
 mockKnex.mock(postgres);
 import userStore from './user';
-import { UserModel } from './user.types';
+import { UserPipeline } from './user.types';
 import { createTableCheck } from '../../helpers/tests';
 import user from './user';
 import Chance from 'chance';
@@ -30,7 +30,7 @@ describe(`
       if (query.sql.toUpperCase().startsWith('CREATE TABLE')) {
         queryHit++;
 
-        const columns: UserModel = {
+        const columns: UserPipeline['_db']['Out'] = {
           id: '',
           username: '',
           password: '',
@@ -51,21 +51,21 @@ describe(`
 
   it('Can build functioning user select query', async (done) => {
     let queryHit = 0;
-    const usernameColumn: keyof UserModel = 'username';
-    const randomUsername: UserModel['username'] = chance.word();
+    const emailColumn: keyof UserPipeline['_insert']['Out'] = 'email';
+    const randomEmail: UserPipeline['_insert']['Out']['email'] = chance.word();
 
     tracker.on('query', (query) => {
       if (query.sql.toUpperCase().startsWith('SELECT * FROM "USERS"')) {
         queryHit++;
 
-        expect(query.sql).toContain(usernameColumn);
-        expect(query.bindings).toContain(randomUsername);
+        expect(query.sql).toContain(emailColumn);
+        expect(query.bindings).toContain(randomEmail);
       }
       query.response({ rows: [] });
     });
 
     await user.createTable();
-    await user.selectByEmail(randomUsername);
+    await user.selectByEmail(randomEmail);
 
     expect(queryHit).toBe(1);
 
@@ -95,7 +95,7 @@ describe(`
   it('Returns user if only one user is found', async (done) => {
     let queryHit = 0;
 
-    const randomUser: UserModel = {
+    const randomUser: UserPipeline['_db']['Out'] = {
       id: chance.guid(),
       username: chance.word(),
       password: chance.word(),
@@ -124,7 +124,7 @@ describe(`
   it('Returns false if more than one user is found', async (done) => {
     let queryHit = 0;
 
-    const randomUsers: UserModel[] = Array(3).fill({
+    const randomUsers: UserPipeline['_insert']['Out'][] = Array(3).fill({
       id: chance.guid(),
       username: chance.word(),
       password: chance.word(),

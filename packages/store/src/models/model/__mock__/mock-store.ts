@@ -1,6 +1,7 @@
 import { Model } from '../model';
 import mockKnex from 'mock-knex';
 import knex from 'knex';
+import { PipelineEssentials } from '../types/sql-pipeline.types';
 
 export interface MockStoreModel {
   id: number;
@@ -8,6 +9,8 @@ export interface MockStoreModel {
   lastName: string;
   age: number;
 }
+
+export type MockStorePipeline = PipelineEssentials;
 
 export type MockStoreInsert = Pick<MockStoreModel, 'name' | 'lastName' | 'age'>;
 
@@ -19,7 +22,7 @@ mockKnex.mock(mockPostgres);
 
 export const tracker = mockKnex.getTracker();
 
-export class MockStore extends Model<MockStoreInsert, MockStoreModel> {
+export class MockStore extends Model<MockStorePipeline> {
   async createTable() {
     return this._createTable((table) => {
       table.increments('id').primary();

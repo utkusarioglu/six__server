@@ -1,121 +1,176 @@
 import express from 'express';
 import store from 'six__server__store';
 import type {
-  PostsGetRes,
-  CommentsGetRes,
-  CommunitiesGetRes,
-  UserCommunitySubscriptionCreateReqParams,
-  UserCommunitySubscriptionCreatePostReq,
-  UserCommunitySubscriptionCreatePostRes,
-  UserCommunitySubscriptionRemovePostReq,
-  UserCommunitySubscriptionRemovePostRes,
+  PostEndpoint,
+  CommunityEndpoint,
+  UserEndpoint,
 } from 'six__public-api';
-import { v4 as uuid } from 'uuid';
+import { validateEndpoint } from '../helpers';
 
 const router = express.Router();
 
-router.get('/headers', (req, res) => {
-  res.json({
-    route: 'headers',
-    headers: req.headers,
-    ip: req.ip,
-    hostname: req.hostname,
-    protocol: req.protocol,
-    resHeaders: res.getHeaders(),
-    reqCookies: req.cookies,
-    session: req.session,
-  });
-});
+(() => {
+  type Method = PostEndpoint['_list']['_v1'];
+  type Response = Method['_get']['_res']['Union'];
+  type Params = Method['_get']['_req']['Params'];
+  type Endpoint = Method['Endpoint'];
 
-router.get('/posts', async (req, res) => {
-  const postsList =
-    req.isAuthenticated() && req.user.id
-      ? await store.post.selectUserPosts(req.user.id)
-      : await store.post.selectVisitorPosts();
+  router.get<Params, Response>(
+    validateEndpoint<Endpoint>('/posts/:requestId'),
+    async (req, res) => {
+      const { requestId } = req.params;
 
-  const postsResponse: PostsGetRes = {
-    id: uuid(),
-    res: postsList,
-  };
+      if (req.user) {
+        const userPosts = await store.post.selectUserPosts(req.user.id);
 
-  res.json(postsResponse);
-});
+        const response: Response = {
+          id: requestId,
+          state: 'success',
+          body: userPosts,
+        };
 
-router.get('/post/slug/:postSlug/comments', async (req, res) => {
-  const postSlug = req.params.postSlug;
+        return res.json(response);
+      } else {
+        const visitorPosts = await store.post.selectVisitorPosts();
 
-  const commentsList = await store.comment.selectByPostSlug(postSlug);
+        const response: Response = {
+          id: requestId,
+          state: 'success',
+          body: visitorPosts,
+        };
 
-  const commentsResponse: CommentsGetRes = {
-    id: uuid(),
-    res: commentsList,
-  };
+        return res.json(response);
+      }
+    }
+  );
+})();
 
-  console.log(commentsResponse);
+(() => {
+  type Method = PostEndpoint['_post_comment']['_v1'];
+  type Response = Method['_get']['_res']['Union'];
+  type Params = Method['_get']['_req']['Params'];
+  type Endpoint = Method['Endpoint'];
 
-  res.json(commentsResponse);
-});
+  router.get<Params, Response>(
+    validateEndpoint<Endpoint>('/post/comments/:postSlug/:requestId'),
+    async (req, res) => {
+      const { postSlug, requestId } = req.params;
 
-router.get('/post/slug/:postSlug', async (req, res) => {
-  const postSlug = req.params.postSlug;
+      const commentsList = await store.comment.selectByPostSlug(postSlug);
 
-  const postsList = await store.post
-    .selectPostBySlug(postSlug)
-    .then((posts) => posts.pop())
-    .catch((e) => console.error(e));
+      const response: Response = {
+        id: requestId,
+        state: 'success' as 'success',
+        body: commentsList,
+      };
 
-  const postsResponse: PostsGetRes = {
-    id: uuid(),
-    res: postsList,
-  };
+      res.json(response);
+    }
+  );
+})();
 
-  res.json(postsResponse);
-});
+(() => {
+  type Method = PostEndpoint['_single']['_v1'];
+  type Params = Method['_get']['_req']['Params'];
+  type Response = Method['_get']['_res']['Union'];
+  type Endpoint = Method['Endpoint'];
 
-router.get('/communities', async (req, res) => {
-  const communitiesList =
-    (await store.community.selectAllForCommunityFeed()) || [];
+  router.get<Params, Response>(
+    validateEndpoint<Endpoint>('/post/slug/:postSlug/:requestId'),
+    async (req, res) => {
+      const { postSlug, requestId } = req.params;
 
-  const communitiesResponse: CommunitiesGetRes = {
-    id: uuid(),
-    res: communitiesList,
-  };
+      const post = await store.post
+        .selectPostBySlug(postSlug)
+        .then((posts) => posts.pop())
+        .catch(console.error);
 
-  res.json(communitiesResponse);
-});
+      const postsResponse: Response = {
+        id: requestId,
+        state: 'success' as 'success',
+        body: post,
+      };
 
-router.post<UserCommunitySubscriptionCreateReqParams>(
-  '/user/:userId/subscribe/:communityId',
-  async (req, res) => {
-    const { userId, communityId } = req.params;
-    try {
-      const subscription = await store.userCommunitySubscription.insert({
-        user_id: userId,
-        community_id: communityId,
-      });
+      res.json(postsResponse);
+    }
+  );
+})();
 
-      if (subscription) {
-        const response: UserCommunitySubscriptionCreatePostRes = {
-          id: 'some_id',
-          res: {
-            communityId: subscription[0].community_id,
-            userId: subscription[0].user_id,
+(() => {
+  type Method = CommunityEndpoint['_list']['_v1'];
+  type Params = Method['_get']['_req']['Params'];
+  type Response = Method['_get']['_res']['Union'];
+  type Endpoint = Method['Endpoint'];
+
+  router.get<Params, Response>(
+    validateEndpoint<Endpoint>('/communities/:requestId'),
+    async (req, res) => {
+      const { requestId } = req.params;
+
+      const communitiesList =
+        (await store.community.selectAllForCommunityFeed()) || [];
+
+      const communitiesResponse: Response = {
+        id: requestId,
+        state: 'success' as 'success',
+        body: communitiesList,
+      };
+
+      res.json(communitiesResponse);
+    }
+  );
+})();
+
+(() => {
+  type Method = UserEndpoint['_user_community_subscription']['_alter']['_v1'];
+  type Params = Method['_post']['_req']['Params'];
+  type Response = Method['_post']['_res']['Union'];
+  type Endpoint = Method['Endpoint'];
+
+  router.post<Params, Response>(
+    validateEndpoint<Endpoint>(
+      'user/:username/:actionType/:communityId/:requestId'
+    ),
+    async (req, res) => {
+      const { requestId, username, communityId } = req.params;
+      try {
+        const subscription = await store.userCommunitySubscription._insert({
+          user_id: username,
+          community_id: communityId,
+        });
+
+        if (subscription) {
+          const response: Response = {
+            id: requestId,
+            state: 'success' as 'success',
+            body: {
+              communityId: subscription[0].community_id,
+              userId: subscription[0].user_id,
+            },
+          };
+          res.json(response);
+        } else {
+          const response: Response = {
+            id: requestId,
+            state: 'fail' as 'fail',
+            errors: {
+              general: 'SUBSCRIPTION_SAVE_FAIL',
+            },
+          };
+          res.json(response);
+        }
+      } catch (error) {
+        const response: Response = {
+          id: requestId,
+          state: 'fail' as 'fail',
+          errors: {
+            general: 'SUBSCRIPTION_SAVE_FAIL',
           },
         };
         res.json(response);
-      } else {
-        res.json({
-          id: 'some id',
-          error: 'something went wrong with subscription save',
-        });
       }
-    } catch (error) {
-      res.json({
-        id: 'some id',
-        error,
-      });
     }
-  }
-);
+  );
+})();
 
 export default router;

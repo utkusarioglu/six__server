@@ -1,11 +1,8 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import { PostCommentInsert, PostCommentModel } from './post-comment.types';
+import { PostCommentPipeline } from './post-comment.types';
 
-export class PostCommentStore extends Model<
-  PostCommentInsert,
-  PostCommentModel
-> {
+export class PostCommentStore extends Model<PostCommentPipeline> {
   /**
    * Creates the respective table in the connected database.
    * Creation only happens if a table with the name {@link this.plural}
