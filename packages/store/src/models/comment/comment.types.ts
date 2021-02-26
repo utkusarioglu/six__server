@@ -8,4 +8,4 @@ export type CommentPrepareInsert = BuildPrepareInsert<CommentPipeline>;
 /**
  * Shape of return when Comments for a particular post is being returned
  */
-export type CommentsForPostSlug = CommentEndpoint['_single']['_v1']['_get']['_res']['Success']['body'];
+export type CommentForPostId = CommentEndpoint['_single']['_v1']['_get']['_res']['Success']['body'];

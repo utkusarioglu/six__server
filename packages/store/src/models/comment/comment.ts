@@ -5,6 +5,7 @@ import {
   CommentInput,
   CommentPrepareInsert,
   CommentPipeline,
+  CommentForPostId,
 } from './comment.types';
 
 export class CommentStore extends Model<CommentPipeline> {
@@ -54,7 +55,7 @@ export class CommentStore extends Model<CommentPipeline> {
     };
   }
 
-  async insert(commentInput: CommentInput) {
+  async insert(commentInput: CommentInput): Promise<CommentForPostId> {
     const {
       insert,
       foreign: { user_id, post_id },
@@ -107,6 +108,18 @@ export class CommentStore extends Model<CommentPipeline> {
           comment_id,
         })
         .catch(rollbackAssociations);
+
+      return {
+        ...commentInput,
+
+        id: comment_id,
+        createdAt: '',
+        likeCount: 0,
+        dislikeCount: 0,
+        postSlug: '',
+        creatorUsername: 'utkusarioglu',
+        state: 'submitted',
+      };
     });
   }
 
@@ -133,7 +146,7 @@ export class CommentStore extends Model<CommentPipeline> {
         .join('user_comments as uc', 'uc.comment_id', 'comments.id')
         .join('users as u', 'u.id', 'uc.user_id')
         .where({ 'pc.post_id': postId });
-    });
+    }).then((rows) => rows.map((row: any) => ({ ...row, state: 'submitted' })));
   }
 }
 

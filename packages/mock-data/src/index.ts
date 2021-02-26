@@ -65,5 +65,5 @@ export async function createMockData(): Promise<void> {
   await mockCommunities();
   await mockVotes();
   await mockPosts();
-  await mockComments();
+  // await mockComments();
 }

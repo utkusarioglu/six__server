@@ -194,7 +194,7 @@ const router = express.Router();
         res.json({
           id: requestId,
           state: 'success' as 'success',
-          body: req.body,
+          body: commentSave,
         });
       } catch (e) {
         res.json({
