@@ -112,7 +112,6 @@ export class CommentStore extends Model<CommentPipeline> {
 
   // !shouldn't be post slug, this is connected data
   async selectByPostId(postId: uuid) {
-    console.log('comments fro post slug:', postId);
     return this._queryBuilder((table) => {
       return table
         .select([
