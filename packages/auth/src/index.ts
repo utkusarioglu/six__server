@@ -4,7 +4,7 @@ import expressSession from 'express-session';
 import store from 'six__server__store';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import { isValidEmail, passwordLengthValid } from './validation/validation';
+import { isValidEmail, passwordLengthValid } from './validation/single';
 import { SESSION_SECRET, SECURE_SCHEMES } from 'six__server__global';
 import type { Express, Request, Response, NextFunction } from 'express';
 import authRoutes from './auth-routes';

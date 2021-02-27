@@ -15,8 +15,7 @@ const router = express.Router();
     validateEndpoint<Endpoint>(
       'user/:username/:actionType/:communityId/:requestId'
     ),
-    async (req, res) => {
-      const { requestId, username, communityId } = req.params;
+    async ({ params: { requestId, username, communityId } }, res) => {
       try {
         const subscription = await store.userCommunitySubscription._insert({
           user_id: username,
@@ -29,7 +28,7 @@ const router = express.Router();
 
         res.json({
           id: requestId,
-          state: 'success' as 'success',
+          state: 'success',
           body: {
             communityId: subscription[0].community_id,
             userId: subscription[0].user_id,
@@ -38,7 +37,7 @@ const router = express.Router();
       } catch (e) {
         res.json({
           id: requestId,
-          state: 'fail' as 'fail',
+          state: 'fail',
           errors: {
             general: 'SUBSCRIPTION_SAVE_FAIL',
           },

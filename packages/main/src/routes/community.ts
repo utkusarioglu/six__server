@@ -13,9 +13,7 @@ const router = express.Router();
 
   router.get<Params, Response>(
     validateEndpoint<Endpoint>('/communities/:requestId'),
-    async (req, res) => {
-      const { requestId } = req.params;
-
+    async ({ params: { requestId } }, res) => {
       try {
         const communitiesList =
           (await store.community.selectAllForCommunityFeed()) || [];

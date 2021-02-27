@@ -1,16 +1,11 @@
 import express from 'express';
 import store from 'six__server__store';
 import passport from 'passport';
-import {
-  passwordLengthValid,
-  passwordStrengthAcceptable,
-  isValidEmail,
-  isValidAge,
-} from './validation/validation';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import type { UserEndpoint } from 'six__public-api';
 import { validateEndpoint } from './helpers';
+import { validateSingupProps } from './validation/pack';
 
 const router = express.Router();
 
@@ -22,11 +17,9 @@ const router = express.Router();
 
   router.get<Params, Response>(
     validateEndpoint<Endpoint>('/session/v1/:requestId'),
-    (req, res) => {
-      const { requestId } = req.params;
-
+    ({ params: { requestId }, user }, res) => {
       // if there is no user session
-      if (!req.user) {
+      if (!user) {
         return res.json({
           id: requestId,
           state: 'success' as 'success',
@@ -35,9 +28,8 @@ const router = express.Router();
           },
         });
       }
-      console.log('should reach here');
 
-      const { username, age, id, email } = req.user;
+      const { username, age, id, email } = user;
       // if there is a user session
       res.json({
         id: requestId,
@@ -64,46 +56,51 @@ const router = express.Router();
   router.post<Params, Response, Body>(
     validateEndpoint<Endpoint>('/login/v1/:requestId'),
     (req, res, next) => {
-      const { requestId } = req.params;
+      // destructuring these inside the function body as
+      // passport needs req, res, next for its call
+      const {
+        params: { requestId },
+      } = req;
 
       passport.authenticate('local', (err, user) => {
         if (err) {
-          console.log(err);
-          const response = {
+          return res.json({
             id: requestId,
-            state: 'fail' as 'fail',
+            state: 'fail',
             errors: {
               general: 'AUTH_FAILURE',
             },
-          };
-          return res.json(response);
+          });
         }
 
         if (!user) {
-          const response = {
+          return res.json({
             id: requestId,
             state: 'fail' as 'fail',
-            errors: { general: 'USER_NOT_FOUND' },
-          };
-          return res.json(response);
+            errors: {
+              general: 'USER_NOT_FOUND',
+            },
+          });
         }
 
         req.login(user, (err) => {
           if (err) {
-            const response = {
+            res.json({
               id: requestId,
-              state: 'fail' as 'fail',
-              errors: { general: 'LOGIN_FAILURE' },
-            };
-            res.json(response);
+              state: 'fail',
+              errors: {
+                general: 'LOGIN_FAILURE',
+              },
+            });
           }
 
           const { username, age, id, email } = user;
 
           return res.json({
             id: requestId,
-            state: 'success' as 'success',
+            state: 'success',
             body: {
+              ...user,
               state: 'logged-in',
               username,
               age,
@@ -126,13 +123,9 @@ const router = express.Router();
 
   router.post<Params, Response, Body>(
     validateEndpoint<Endpoint>('/logout/v1/:requestId'),
-    async (req, res) => {
-      const { requestId } = req.params;
-
-      if (req.user) {
-        req.logout();
-      } else {
-        console.log(`User wasn't logged in`);
+    async ({ params: { requestId }, user, logout }, res) => {
+      if (user) {
+        logout();
       }
 
       res.json({
@@ -156,90 +149,63 @@ const router = express.Router();
   router.post<Params, Response, Body>(
     validateEndpoint<Endpoint>('/signup/v1/:requestId'),
     async (req, res, next) => {
-      const { requestId } = req.params;
-      const { username, password, email, age } = req.body;
-      const errors: Partial<Body> = {};
+      // Cannot destructure in params as passport.login fails to work
+      // properly with destructuring
+      const {
+        body,
+        params: { requestId },
+      } = req;
+      const { password, email } = body;
 
-      if (!passwordLengthValid(password)) {
-        errors.password = 'PASSWORD_LENGTH_ILLEGAL';
-      }
-
-      if (!passwordStrengthAcceptable(password)) {
-        errors.password = 'PASSWORD_WEAK';
-      }
-
-      if (!isValidEmail(email)) {
-        errors.email = 'EMAIL_INVALID';
-      }
-
-      if (!isValidAge(age)) {
-        // @ts-ignore
-        errors.age = 'AGE_INVALID';
-      }
-
-      // errors.username = 'USERNAME_STUPID';
+      const errors = validateSingupProps(body);
 
       if (Object.keys(errors).length) {
-        const response = {
+        return res.json({
           id: requestId,
-          state: 'fail' as 'fail',
+          state: 'fail',
           errors,
-        };
-
-        // @ts-ignore
-        return res.json(response);
+        });
       }
 
-      store.user
-        .selectByEmail(email)
-        .then(async (user) => {
-          if (user !== false) {
-            const response = {
-              id: requestId,
-              state: 'fail' as 'fail',
-              errors: {
-                email: 'EMAIL_IN_USE',
-              },
-            };
-            return res.json(response);
-          }
+      const user = await store.user.selectByEmail(email);
 
-          bcrypt
-            .hash(password, 10)
-            .then((passwordHashed) => {
-              const userModel = {
-                id: uuidv4(),
-                username,
-                password: passwordHashed,
-                email,
-                age,
-              };
-              store.user._insert(userModel).then(() => {
-                const userLogin = {
-                  id: userModel.id,
-                  username: userModel.username,
-                  email: userModel.email,
-                  age: userModel.age,
-                  state: 'logged-in' as 'logged-in',
-                };
+      if (user !== false) {
+        return res.json({
+          id: requestId,
+          state: 'fail',
+          errors: {
+            email: 'EMAIL_IN_USE',
+          },
+        });
+      }
 
-                req.login(userLogin, (err: string) => {
-                  if (err) {
-                    return next(err);
-                  }
+      const passwordHashed = await bcrypt.hash(password, 10);
+      const id = uuidv4();
+      const userModel = {
+        ...body,
+        id,
+        password: passwordHashed,
+      };
 
-                  return res.json({
-                    id: requestId,
-                    state: 'success' as 'success',
-                    body: userLogin,
-                  });
-                });
-              });
-            })
-            // hash fail
-            .catch(console.error);
-        })
-        .catch(console.error);
+      await store.user._insert(userModel);
+
+      const userLogin = {
+        ...body,
+        id,
+        state: 'logged-in' as 'logged-in',
+      };
+
+      req.login(userLogin, (err: string) => {
+        if (err) {
+          return next(err);
+        }
+
+        return res.json({
+          id: requestId,
+          state: 'success',
+          body: userLogin,
+        });
+      });
     }
   );
 })();

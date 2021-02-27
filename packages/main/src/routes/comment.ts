@@ -14,10 +14,10 @@ const router = express.Router();
 
   router.post<Params, Response, Body>(
     validateEndpoint<Endpoint>('/comment/save/:requestId'),
-    async (req, res) => {
-      const { requestId } = req.params;
-      const { parentId, body, userId, postId } = req.body;
-
+    async (
+      { params: { requestId }, body: { parentId, body, userId, postId } },
+      res
+    ) => {
       try {
         const commentSave = await store.comment.insert({
           body,

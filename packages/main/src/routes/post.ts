@@ -13,11 +13,10 @@ const router = express.Router();
 
   router.get<Params, Response>(
     validateEndpoint<Endpoint>('/posts/:requestId'),
-    async (req, res) => {
-      const { requestId } = req.params;
+    async ({ params: { requestId }, user }, res) => {
       try {
-        const posts = req.user
-          ? await store.post.selectUserPosts(req.user.id)
+        const posts = user
+          ? await store.post.selectUserPosts(user.id)
           : await store.post.selectVisitorPosts();
 
         if (!posts) {
@@ -50,8 +49,7 @@ const router = express.Router();
 
   router.get<Params, Response>(
     validateEndpoint<Endpoint>('/post/:postId/comments/:requestId'),
-    async (req, res) => {
-      const { postId, requestId } = req.params;
+    async ({ params: { postId, requestId } }, res) => {
       try {
         const commentsList = await store.comment.selectByPostId(postId);
 
@@ -59,13 +57,13 @@ const router = express.Router();
           throw new Error();
         }
 
-        res.json({
+        return res.json({
           id: requestId,
           state: 'success' as 'success',
           body: commentsList,
         });
       } catch (e) {
-        res.json({
+        return res.json({
           id: requestId,
           state: 'fail',
           errors: {
@@ -85,9 +83,7 @@ const router = express.Router();
 
   router.get<Params, Response>(
     validateEndpoint<Endpoint>('/post/slug/:postSlug/:requestId'),
-    async (req, res) => {
-      const { postSlug, requestId } = req.params;
-
+    async ({ params: { postSlug, requestId } }, res) => {
       try {
         const post = await store.post
           .selectPostBySlug(postSlug)
@@ -97,17 +93,17 @@ const router = express.Router();
           throw new Error();
         }
 
-        res.json({
+        return res.json({
           id: requestId,
           state: 'success' as 'success',
           body: post,
         });
       } catch (e) {
-        res.json({
+        return res.json({
           id: requestId,
           state: 'fail',
           errors: {
-            general: 'POST_FETCH_FAL',
+            general: 'POST_FETCH_FAIL',
           },
         });
       }
