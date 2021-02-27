@@ -6,8 +6,10 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { useAuth, checkAuth } from 'six__server__auth';
 import { createMockData } from 'six__server__mock-data';
-import insecure from './routes/insecure';
-import secure from './routes/secure';
+import comment from './routes/comment';
+import community from './routes/community';
+import post from './routes/post';
+import user from './routes/user';
 import fourOFour from './routes/404';
 import store from 'six__server__store';
 
@@ -26,8 +28,11 @@ app.use(
 useAuth(app);
 
 // app.use('/files', express.static(path.join(__dirname, 'public')));
-app.use('/api', insecure);
-app.use('/api/auth', checkAuth, secure);
+app.use('/api', comment);
+app.use('/api', community);
+app.use('/api', post);
+app.use('/api', user);
+
 app.use(fourOFour);
 
 if (NODE_ENV !== 'production') {
