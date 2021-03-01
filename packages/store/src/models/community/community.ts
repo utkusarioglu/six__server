@@ -41,6 +41,22 @@ export class CommunityStore extends Model<CommunityPipeline> {
       })
     );
   }
+
+  async selectBySlug(slug: string) {
+    return this._queryBuilder((table) => {
+      return table
+        .select({
+          id: 'id',
+          createdAt: 'created_at',
+          description: 'description',
+          name: 'name',
+          slug: 'slug',
+          postCount: 'post_count',
+          subscriberCount: 'subscriber_count',
+        })
+        .where({ slug });
+    });
+  }
 }
 
 export default new CommunityStore({
