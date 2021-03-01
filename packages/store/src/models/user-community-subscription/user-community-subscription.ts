@@ -1,6 +1,12 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import { UserCommunitySubscriptionPipeline } from './user-community-subscription.types';
+import {
+  UCSCommunityId,
+  UCSInput,
+  UCSPrepareInsert,
+  UCSUserId,
+  UserCommunitySubscriptionPipeline,
+} from './user-community-subscription.types';
 
 export class UserCommunitySubscriptionStore extends Model<UserCommunitySubscriptionPipeline> {
   /**
@@ -28,6 +34,34 @@ export class UserCommunitySubscriptionStore extends Model<UserCommunitySubscript
         .onDelete('CASCADE')
         .onUpdate('CASCADE');
     });
+  }
+
+  private prepareInsert({ userId, communityId }: UCSInput): UCSPrepareInsert {
+    return {
+      insert: {
+        user_id: userId,
+        community_id: communityId,
+      },
+      foreign: {},
+    };
+  }
+
+  insert(ucsInput: UCSInput) {
+    const { insert } = this.prepareInsert(ucsInput);
+    return this._insert(insert, ['user_id', 'community_id']);
+  }
+
+  delete(communityId: string) {
+    return this._queryBuilder((table) => {
+      return table.delete().where({ community_id: communityId });
+    });
+  }
+
+  getCommunityIdsForUserId(userId: UCSUserId): Promise<UCSCommunityId[]> {
+    return this._queryBuilder((table) => {
+      return table.select(['community_id ']).where({ user_id: userId });
+      // @ts-ignore
+    }).then((rows) => rows.map((row) => row.community_id));
   }
 }
 
