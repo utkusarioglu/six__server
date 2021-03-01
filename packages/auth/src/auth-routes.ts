@@ -123,9 +123,13 @@ const router = express.Router();
 
   router.post<Params, Response, Body>(
     validateEndpoint<Endpoint>('/logout/v1/:requestId'),
-    async ({ params: { requestId }, user, logout }, res) => {
+    async (req, res) => {
+      const {
+        params: { requestId },
+        user,
+      } = req;
       if (user) {
-        logout();
+        req.logout();
       }
 
       res.json({
