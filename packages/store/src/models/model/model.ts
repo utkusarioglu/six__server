@@ -241,6 +241,8 @@ export abstract class Model<Pipeline extends PipelineEssentials> {
 
   /**
    * @unused
+   * @alpha
+   *
    * Helper for defining column names. By default it converts the snake_case
    * column names to camelCase used in ts/js.
    *

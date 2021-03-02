@@ -1,6 +1,9 @@
 import postgres from '../../connectors/postgres';
 import { Model } from '../model/model';
-import { CommunityPipeline } from './community.types';
+import {
+  CommunityPipeline,
+  SelectForCommunityFeedColumns,
+} from './community.types';
 
 export class CommunityStore extends Model<CommunityPipeline> {
   /**
@@ -28,32 +31,105 @@ export class CommunityStore extends Model<CommunityPipeline> {
   /**
    * Selects the communities list for the consumption of community feed
    */
-  async selectAllForCommunityFeed() {
+  async selectForCommunityFeedForVisitor() {
+    const columns: SelectForCommunityFeedColumns = {
+      id: 'communities.id',
+      createdAt: 'created_at',
+      description: 'description',
+      name: 'name',
+      slug: 'slug',
+      postCount: 'post_count',
+      subscriberCount: 'subscriber_count',
+      /**
+       * Visitors cannot have subscriptions but as the same endpoint is used,
+       * returning the same data shape makes things simpler. For this reason
+       * visitors also return a static ucs = NULL property
+       */
+      ucs: this._raw('FALSE'),
+    };
+
     return this._queryBuilder((table) =>
-      table.select({
-        id: 'id',
-        createdAt: 'created_at',
-        description: 'description',
-        name: 'name',
-        slug: 'slug',
-        postCount: 'post_count',
-        subscriberCount: 'subscriber_count',
-      })
+      table
+        .select(columns)
+        .leftJoin(
+          { ucs: 'user_community_subscriptions' },
+          'ucs.community_id',
+          'communities.id'
+        )
+        .orderBy('communities.name')
     );
   }
 
-  async selectBySlug(slug: string) {
+  /**
+   * Selects the communities list for the consumption of community feed
+   */
+  async selectForCommunityFeedForUserId(userId: string) {
+    const columns: SelectForCommunityFeedColumns = {
+      id: 'communities.id',
+      createdAt: 'communities.created_at',
+      description: 'communities.description',
+      name: 'communities.name',
+      slug: 'communities.slug',
+      postCount: 'communities.post_count',
+      subscriberCount: 'communities.subscriber_count',
+      ucs: this._raw(
+        `
+        CASE 
+          WHEN s.ucs_community_id IS NOT NULL 
+          THEN TRUE 
+          ELSE FALSE 
+        END
+        `
+      ),
+    };
+
+    return this._queryBuilder((table) =>
+      table
+        .select(columns)
+        .leftJoin(
+          postgres
+            .select({
+              ucs_community_id: 'ucs.community_id',
+            })
+            .from({ ucs: 'user_community_subscriptions' })
+            .leftJoin('users as u', 'u.id', 'ucs.user_id')
+            .where({ 'u.id': userId })
+            .as('s'),
+          's.ucs_community_id',
+          'communities.id'
+        )
+        .orderBy('communities.name')
+    );
+  }
+
+  async selectForCommunityDetails(slug: string) {
+    const columns: SelectForCommunityFeedColumns = {
+      id: 'communities.id',
+      createdAt: 'communities.created_at',
+      description: 'communities.description',
+      name: 'communities.name',
+      slug: 'communities.slug',
+      postCount: 'communities.post_count',
+      subscriberCount: 'communities.subscriber_count',
+      ucs: this._raw(
+        `
+        CASE 
+          WHEN s.ucs_community_id IS NOT NULL 
+          THEN TRUE 
+          ELSE FALSE 
+        END
+        `
+      ),
+    };
+
     return this._queryBuilder((table) => {
       return table
-        .select({
-          id: 'id',
-          createdAt: 'created_at',
-          description: 'description',
-          name: 'name',
-          slug: 'slug',
-          postCount: 'post_count',
-          subscriberCount: 'subscriber_count',
-        })
+        .select(columns)
+        .leftJoin(
+          { ucs: 'user_community_subscriptions' },
+          'ucs.community_id',
+          'communities.id'
+        )
         .where({ slug });
     });
   }

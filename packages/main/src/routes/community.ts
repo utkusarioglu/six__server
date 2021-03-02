@@ -13,10 +13,18 @@ const router = express.Router();
 
   router.get<Params, Response>(
     validateEndpoint<Endpoint>('/communities/:requestId'),
-    async ({ params: { requestId } }, res) => {
+    async (req, res) => {
+      const {
+        params: { requestId },
+        user,
+      } = req;
+
       try {
-        const communitiesList =
-          (await store.community.selectAllForCommunityFeed()) || [];
+        const communitiesList = req.user
+          ? await store.community.selectForCommunityFeedForUserId(user.id)
+          : await store.community.selectForCommunityFeedForVisitor();
+
+        console.log('communities list ', communitiesList);
 
         if (!communitiesList) {
           throw new Error();
@@ -50,8 +58,11 @@ const router = express.Router();
     validateEndpoint<Endpoint>('/community/:communitySlug/:requestId'),
     async ({ params: { requestId, communitySlug } }, res) => {
       try {
-        const communities = await store.community.selectBySlug(communitySlug);
+        const communities = await store.community.selectForCommunityDetails(
+          communitySlug
+        );
 
+        console.log('communities', communities);
         if (!communities.length) {
           throw new Error('COMMUNITY_FETCH_ERROR');
         }

@@ -6,6 +6,7 @@ import {
   CommentPrepareInsert,
   CommentPipeline,
   CommentForPostId,
+  CommentForPostIdColumns,
 } from './comment.types';
 
 export class CommentStore extends Model<CommentPipeline> {
@@ -123,30 +124,30 @@ export class CommentStore extends Model<CommentPipeline> {
     });
   }
 
-  // !shouldn't be post slug, this is connected data
   async selectByPostId(postId: uuid) {
+    const columns: CommentForPostIdColumns = {
+      id: 'comments.id',
+      parentId: 'comments.parent_id',
+      createdAt: 'comments.created_at',
+      body: 'comments.body',
+      likeCount: 'comments.like_count',
+      dislikeCount: 'comments.dislike_count',
+      postSlug: 'p.slug',
+      postId: 'p.id',
+      userId: 'u.id',
+      creatorUsername: 'u.username',
+      state: this._raw("'submitted'"),
+    };
+
     return this._queryBuilder((table) => {
       return table
-        .select([
-          'comments.id',
-          'comments.parent_id as parentId',
-          'comments.created_at as createdAt',
-          'comments.body as body',
-          'comments.like_count as likeCount',
-          'comments.dislike_count as dislikeCount',
-
-          'p.slug as postSlug',
-          'p.id as postId',
-
-          'u.id as userId',
-          'u.username as creatorUsername',
-        ])
-        .join('post_comments as pc', 'comments.id', 'pc.comment_id')
-        .join('posts as p', 'p.id', 'pc.post_id')
-        .join('user_comments as uc', 'uc.comment_id', 'comments.id')
-        .join('users as u', 'u.id', 'uc.user_id')
+        .select(columns)
+        .join({ pc: 'post_comments' }, 'comments.id', 'pc.comment_id')
+        .join({ p: 'posts' }, 'p.id', 'pc.post_id')
+        .join({ uc: 'user_comments' }, 'uc.comment_id', 'comments.id')
+        .join({ u: 'users' }, 'u.id', 'uc.user_id')
         .where({ 'pc.post_id': postId });
-    }).then((rows) => rows.map((row: any) => ({ ...row, state: 'submitted' })));
+    });
   }
 }
 

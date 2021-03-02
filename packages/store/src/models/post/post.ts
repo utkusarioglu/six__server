@@ -66,13 +66,16 @@ export class PostStore extends Model<PostPipeline> {
   async selectUserPosts(user_id: string) {
     return this._queryBuilder((table) => {
       return table
-        .join('user_posts as up', 'posts.id', 'up.post_id')
-        .join('users as u', 'u.id', 'up.user_id')
-        .join('community_posts AS cp', 'cp.post_id', 'posts.id')
-        .join('communities AS c', 'c.id', 'cp.community_id')
-        .join('user_community_subscriptions AS ucs', 'ucs.community_id', 'c.id')
-        .leftJoin('post_user_contents as puc', 'posts.id', 'puc.post_id')
-        .leftJoin('user_contents as uc', 'puc.user_content_id', 'uc.id')
+        .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
+        .join({ c: 'communities' }, 'c.id', 'cp.community_id')
+        .join(
+          { ucs: 'user_community_subscriptions' },
+          'ucs.community_id',
+          'c.id'
+        )
+        .join({ u: 'users' }, 'u.id', 'ucs.user_id')
+        .leftJoin({ puc: 'post_user_contents' }, 'posts.id', 'puc.post_id')
+        .leftJoin({ uc: 'user_contents' }, 'puc.user_content_id', 'uc.id')
         .select(this._post_columns)
         .where({ 'u.id': user_id });
     });
@@ -84,17 +87,17 @@ export class PostStore extends Model<PostPipeline> {
   async selectVisitorPosts() {
     return this._queryBuilder((table) => {
       return table
-        .join('user_posts as up', 'posts.id', 'up.post_id')
-        .join('users as u', 'u.id', 'up.user_id')
-        .join('community_posts AS cp', 'cp.post_id', 'posts.id')
-        .join('communities AS c', 'c.id', 'cp.community_id')
+        .join({ up: 'user_posts' }, 'posts.id', 'up.post_id')
+        .join({ u: 'users' }, 'u.id', 'up.user_id')
+        .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
+        .join({ c: 'communities' }, 'c.id', 'cp.community_id')
         .join(
-          'visitor_community_subscriptions AS vc',
-          'vc.community_id',
+          { vcs: 'visitor_community_subscriptions' },
+          'vcs.community_id',
           'c.id'
         )
-        .leftJoin('post_user_contents as puc', 'posts.id', 'puc.post_id')
-        .leftJoin('user_contents as uc', 'puc.user_content_id', 'uc.id')
+        .leftJoin({ puc: 'post_user_contents' }, 'posts.id', 'puc.post_id')
+        .leftJoin({ uc: 'user_contents' }, 'puc.user_content_id', 'uc.id')
         .select(this._post_columns);
     });
   }
@@ -108,12 +111,12 @@ export class PostStore extends Model<PostPipeline> {
     return this._queryBuilder((table) => {
       return table
         .select(this._post_columns)
-        .join('user_posts as up', 'posts.id', 'up.post_id')
-        .join('users as u', 'u.id', 'up.user_id')
-        .join('community_posts AS cp', 'cp.post_id', 'posts.id')
-        .join('communities AS c', 'c.id', 'cp.community_id')
-        .leftJoin('post_user_contents as puc', 'posts.id', 'puc.post_id')
-        .leftJoin('user_contents as uc', 'puc.user_content_id', 'uc.id')
+        .join({ up: 'user_posts' }, 'posts.id', 'up.post_id')
+        .join({ u: 'users' }, 'u.id', 'up.user_id')
+        .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
+        .join({ c: 'communities' }, 'c.id', 'cp.community_id')
+        .leftJoin({ puc: 'post_user_contents' }, 'posts.id', 'puc.post_id')
+        .leftJoin({ uc: 'user_contents' }, 'puc.user_content_id', 'uc.id')
         .where({ 'posts.slug': postSlug });
     });
   }

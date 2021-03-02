@@ -1,5 +1,5 @@
 import type { Overwrite } from 'utility-types';
-import type { ColumnBuilder, CreateTableBuilder, Transaction } from 'knex';
+import type { ColumnBuilder, CreateTableBuilder, Raw, Transaction } from 'knex';
 import type { DataNodeEssentials } from './sql-pipeline.types';
 
 /**
@@ -77,3 +77,22 @@ export type BuildInsertParams<Pipeline extends PipelineEssentials> = [
   (keyof Pipeline['_db']['Out'])[],
   Transaction
 ];
+
+/**
+ * Creates object type for select columns that knex uses
+ *
+ * @example
+ * ```ts
+ * const columns: SelectColumns<{tableId: number, static: string}> = {
+ *  tableId: 'some_table.some_id'
+ *  static: this._raw("'some static value'")
+ * }
+ * ```
+ * The type uses the keys of the Record that is given as the generic
+ * and maps these to string and knex.Raw. This allows db column reference
+ * with string and with knex raw method.
+ */
+export type SelectColumns<Body extends Record<keyof any, any>> = Record<
+  keyof Body,
+  string | Raw
+>;
