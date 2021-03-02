@@ -6,6 +6,7 @@ import {
   PostSlug,
   PostInput,
   PostPrepareInsert,
+  PostColumns,
 } from './post.types';
 import store from 'six__server__store';
 
@@ -18,21 +19,21 @@ export class PostStore extends Model<PostPipeline> {
    * The column names returned should be consistent with
    * public-api.PostsResponse
    */
-  private _post_columns = [
-    'posts.id',
-    'posts.created_at AS createdAt',
-    'posts.title AS postTitle',
-    'posts.body AS postBody',
-    'posts.slug AS postSlug',
-    'posts.like_count as likeCount',
-    'posts.dislike_count as dislikeCount',
-    'posts.comment_count AS commentCount',
-    'u.username as creatorUsername',
-    'c.name AS communityName',
-    'c.slug AS communitySlug',
-    'uc.filename AS mediaImagePath',
-    'uc.type AS mediaType',
-  ];
+  private _post_columns: PostColumns = {
+    id: 'posts.id',
+    createdAt: 'posts.created_at',
+    postTitle: 'posts.title',
+    postBody: 'posts.body',
+    postSlug: 'posts.slug',
+    likeCount: 'posts.like_count',
+    dislikeCount: 'posts.dislike_count',
+    commentCount: 'posts.comment_count',
+    creatorUsername: 'u.username',
+    communityName: 'c.name',
+    communitySlug: 'c.slug',
+    mediaImagePath: 'uc.filename',
+    mediaType: 'uc.type',
+  };
 
   /**
    * Creates the respective table in the connected database.
