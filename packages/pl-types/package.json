@@ -1,0 +1,12 @@
+{
+  "name": "six__server__pl-types",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf ./lib tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "six__server__ep-types": "^1.0.0"
+  }
+}
