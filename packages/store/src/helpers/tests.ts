@@ -47,7 +47,8 @@ export function getSqlColumns(selectColumnMatch: RegExpMatchArray) {
       .split('"')
       .join('')
       // split by commas
-      .split(',')
+      .split(/,|(?:left join)|(?:join)|(?:right join)|(?:inner join)/)
+      // .split(',')
       .map((col) =>
         col
           // split by "as" and trim results
