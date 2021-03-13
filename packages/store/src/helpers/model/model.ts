@@ -1,11 +1,9 @@
 import type Knex from 'knex';
+import type { Transaction } from 'knex';
 import { NODE_ENV } from 'six__server__global';
-import { ModelProps, CustomTableBuilder } from './types/model.types';
+import { ModelProps, CustomTableBuilder } from './model.types';
 import { ERROR_MESSAGES } from './model.constants';
-import type {
-  DefaultSqlPipeline,
-  PipelineEssentials,
-} from './types/sql-pipeline.types';
+import type { PipelineEssentials } from 'six__server__pl-types';
 import _ from 'lodash';
 
 /**
@@ -25,7 +23,7 @@ export abstract class Model<Pipeline extends PipelineEssentials> {
 
   // TODO this type doesn't work, errors are disabled with ts-ignore
   /** database connector built by {@link Knex} */
-  protected _db: Knex<Pipeline['_db']['Out'], Pipeline['_db']['Out'][]>;
+  protected _db: Knex<Pipeline['_db']['In'], Pipeline['_db']['OutT'][]>;
 
   /** Shorthand for knex.schema */
   private _schema: Knex.SchemaBuilder;
@@ -102,7 +100,7 @@ export abstract class Model<Pipeline extends PipelineEssentials> {
    * table. This may cause issues if it's not accounted for.
    */
   protected async _createTable(
-    tableBuilder: CustomTableBuilder<Pipeline['_db']['Out']>
+    tableBuilder: CustomTableBuilder<Pipeline['_db']['OutT']>
   ) {
     this._tableCreateCalled = true;
     if (await this._schema.hasTable(this._plural)) return;
@@ -180,8 +178,8 @@ export abstract class Model<Pipeline extends PipelineEssentials> {
    * @param inserts data to be inserted, defined by the Insert generic type
    * defined by the particular instance
    */
-  async _insert(
-    inserts: Pipeline['_insert']['Out'] | Pipeline['_insert']['Out'][],
+  async _insert_old(
+    inserts: Pipeline['_insert']['OutT'] | Pipeline['_insert']['OutT'][],
     returns?: (keyof Pipeline['_db']['Out'])[],
     transaction?: Knex.Transaction
   ) {
@@ -228,8 +226,8 @@ export abstract class Model<Pipeline extends PipelineEssentials> {
    * Wrapper for the particular connector's raw method
    * @param rawString raw string to be used in the query
    */
-  protected _raw(rawString: string) {
-    return this._getConnector().raw(rawString);
+  protected _raw(rawString: string, bindings: string[] = []) {
+    return this._getConnector().raw(rawString, bindings);
   }
 
   /**
@@ -338,5 +336,37 @@ export abstract class Model<Pipeline extends PipelineEssentials> {
       return Promise.resolve();
     }
     return this._getConnector().initialize();
+  }
+
+  async _insert<Input, Output>(
+    input: Input,
+    prepare: (input: Input) => Pipeline['_db']['In'],
+    returnColumns: (keyof Pipeline['_db']['Out'])[] | undefined = undefined,
+    transaction?: Transaction,
+    rollback?: () => void
+  ): Promise<Output | void> {
+    const insert = prepare(input);
+
+    if (transaction) {
+      // @ts-ignore
+      return (
+        this._getTable()
+          .transacting(transaction)
+          // @ts-ignore
+          .insert(insert, returnColumns)
+          .catch((e) => {
+            rollback ? rollback() : transaction.rollback();
+            this._errorHandler(e);
+          })
+      );
+    } else {
+      // @ts-ignore
+      return (
+        this._getTable()
+          // @ts-ignore
+          .insert(insert, returnColumns)
+          .catch(this._errorHandler)
+      );
+    }
   }
 }

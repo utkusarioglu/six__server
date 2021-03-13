@@ -1,7 +1,7 @@
 import { Model } from '../model';
 import mockKnex from 'mock-knex';
 import knex from 'knex';
-import { PipelineEssentials } from '../types/sql-pipeline.types';
+import { PipelineEssentials } from 'six__server__pl-types';
 
 export interface MockStoreModel {
   id: number;

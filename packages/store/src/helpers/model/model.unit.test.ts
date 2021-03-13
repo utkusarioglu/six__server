@@ -8,7 +8,7 @@ import {
   MockStoreInsert,
 } from './__mock__/mock-store';
 import _ from 'lodash';
-import { createTableCheck } from '../../helpers/tests';
+import { createTableCheck } from '../tests';
 
 let mockStore: MockStore | null;
 const chance = Chance();
@@ -93,7 +93,7 @@ describe(`
         Error(ERROR_MESSAGES.PREMATURE_TABLE_CALL)
       );
 
-      expect(mockStore._insert.bind(mockStore)).rejects.toEqual(
+      expect(mockStore._insert_old.bind(mockStore)).rejects.toEqual(
         Error(ERROR_MESSAGES.PREMATURE_TABLE_CALL)
       );
 
@@ -212,7 +212,7 @@ describe(`
       });
 
       await mockStore.createTable();
-      await mockStore._insert(insertion);
+      await mockStore._insert_old(insertion);
       expect(queryHit).toBe(1);
       done();
     });
@@ -252,7 +252,7 @@ describe(`
       });
 
       await mockStore.createTable();
-      await mockStore._insert(insertions);
+      await mockStore._insert_old(insertions);
       expect(queryHit).toBe(1);
 
       done();

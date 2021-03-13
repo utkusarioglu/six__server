@@ -1,6 +1,7 @@
 import type { Overwrite } from 'utility-types';
 import type { ColumnBuilder, CreateTableBuilder, Raw, Transaction } from 'knex';
-import type { DataNodeEssentials } from './sql-pipeline.types';
+import type { PipelineEssentials } from 'six__server__pl-types';
+import type { MapKeys } from '../../@types/map-keys.types';
 
 /**
  * Defines the properties that need to be provided to Model during
@@ -62,19 +63,14 @@ export type CustomTableBuilder<T> = (
   table: CustomTableBuilderMethods<T>
 ) => any;
 
-type PipelineEssentials = {
-  _insert: DataNodeEssentials;
-  _db: DataNodeEssentials;
-};
-
 export type BuildPrepareInsert<Pipeline extends PipelineEssentials> = {
-  insert: Pipeline['_insert']['Out'];
-  foreign: Pipeline['_insert']['Splits'];
+  insert: Pipeline['_insert']['OutT'];
+  foreign: Pipeline['_insert']['SplitsT'];
 };
 
 export type BuildInsertParams<Pipeline extends PipelineEssentials> = [
   Pipeline['_insert']['In'],
-  (keyof Pipeline['_db']['Out'])[],
+  (keyof Pipeline['_db']['OutT'])[],
   Transaction
 ];
 
@@ -92,7 +88,16 @@ export type BuildInsertParams<Pipeline extends PipelineEssentials> = [
  * and maps these to string and knex.Raw. This allows db column reference
  * with string and with knex raw method.
  */
-export type SelectColumns<Body extends Record<keyof any, any>> = Record<
-  keyof Body,
-  string | Raw
->;
+export type ColumnMapping<
+  Body extends Record<keyof any, any>,
+  Translate extends Record<keyof any, keyof any> = {}
+> = MapKeys<Record<keyof Body, string | Raw>, Translate>;
+
+/**
+ * Generic type for creating select rows
+ */
+export type PickSelectRows<
+  DbOut extends PipelineEssentials = PipelineEssentials,
+  Picks extends keyof any = never,
+  Translate extends Record<keyof any, keyof any> = {}
+> = MapKeys<Pick<DbOut['_db']['OutT'], Picks>, Translate>;
