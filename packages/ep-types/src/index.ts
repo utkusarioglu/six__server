@@ -6,6 +6,7 @@ import type {
   VoteTypes,
   UserLoginResSuccessful,
 } from 'six__public-api';
+import type { ErrorsOut } from './@types/errors-out';
 
 /**
  * Posts
@@ -67,6 +68,7 @@ export type UserSessionOut = UserSession['_get']['_res']['Success']['body'];
 export type UserSignup = UserEp['_signup']['_v1'];
 export type UserSignupIn = UserSignup['_post']['_req']['Body'];
 export type UserSignupOut = UserSignup['_post']['_res']['Success']['body'];
+export type UserSingupResponseErrors = ErrorsOut<UserSignupIn>;
 
 export type UserUcsAlter = UserEp['_user_community_subscription']['_ucs']['_v1'];
 export type UserUcsAlterIn = UserUcsAlter['_post']['_req']['Body'];
