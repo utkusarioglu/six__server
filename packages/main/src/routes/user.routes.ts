@@ -1,48 +1,32 @@
-import express, { request } from 'express';
+import type { UserUcsAlter, UserUcsIdList } from 'six__server__ep-types';
+import express from 'express';
 import store from 'six__server__store';
-import type { UserEndpoint } from 'six__public-api';
 import { validateEndpoint } from '../helpers';
 
 const router = express.Router();
 
 (() => {
-  type Method = UserEndpoint['_user_community_subscription']['_alter']['_v1'];
+  type Method = UserUcsAlter;
   type Params = Method['_post']['_req']['Params'];
   type Response = Method['_post']['_res']['Union'];
   type Endpoint = Method['Endpoint'];
 
   // todo doesn't cover unsubscribe
   router.post<Params, Response>(
-    validateEndpoint<Endpoint>(
-      '/user/:userId/:actionType/:communityId/:requestId'
-    ),
-    async ({ params: { requestId, userId, communityId, actionType } }, res) => {
+    validateEndpoint<Endpoint>('/user/ucs/:requestId'),
+    async (
+      { params: { requestId }, body: { userId, communityId, actionType } },
+      res
+    ) => {
       try {
-        switch (actionType) {
-          case 'subscribe':
-            const subscription = await store.userCommunitySubscription.insert({
-              userId,
-              communityId,
-            });
+        const subscriptionResponse = await store.users.alterUcs({
+          actionType,
+          userId,
+          communityId,
+        });
 
-            if (!subscription) {
-              throw new Error('SUBSCRIBE_FAIL');
-            }
-
-            break;
-          case 'unsubscribe':
-            const unsubscribe = await store.userCommunitySubscription.delete(
-              communityId
-            );
-
-            if (unsubscribe === 0) {
-              throw new Error('UNSUBSCRIBE_FAIL');
-            }
-
-            break;
-
-          default:
-            throw new Error('ILLEGAL_ACTION_TYPE');
+        if (!subscriptionResponse) {
+          throw new Error('UCS_ALTER_FAIL');
         }
 
         // Values are reflected back to the client, this may cause issues
@@ -56,11 +40,12 @@ const router = express.Router();
           },
         });
       } catch (e) {
+        console.error(e);
         res.json({
           id: requestId,
           state: 'fail',
           errors: {
-            general: e || 'UCS_GENERAL_FAIL',
+            general: 'UCS_GENERAL_FAIL',
           },
         });
       }
@@ -69,18 +54,16 @@ const router = express.Router();
 })();
 
 (() => {
-  type Method = UserEndpoint['_user_community_subscription']['_id_list']['_v1'];
+  type Method = UserUcsIdList;
   type Params = Method['_get']['_req']['Params'];
   type Response = Method['_get']['_res']['Union'];
   type Endpoint = Method['Endpoint'];
 
   router.get<Params, Response>(
-    validateEndpoint<Endpoint>('/user/:userId/subscriptions/id/:requestId'),
+    validateEndpoint<Endpoint>('/user/:userId/subscriptions/id/v1/:requestId'),
     async ({ params: { requestId, userId } }, res) => {
       try {
-        const ids = await store.userCommunitySubscription.getCommunityIdsForUserId(
-          userId
-        );
+        const ids = await store.users.getUcsIds(userId);
 
         if (!ids) {
           throw new Error();
@@ -92,6 +75,7 @@ const router = express.Router();
           body: ids,
         });
       } catch (e) {
+        console.error(e);
         res.json({
           id: requestId,
           state: 'fail',

@@ -1,18 +1,18 @@
+import type { CommunityList, CommunitySingle } from 'six__server__ep-types';
 import express from 'express';
 import store from 'six__server__store';
-import type { CommunityEndpoint } from 'six__public-api';
 import { validateEndpoint } from '../helpers';
 
 const router = express.Router();
 
 (() => {
-  type Method = CommunityEndpoint['_list']['_v1'];
+  type Method = CommunityList;
   type Params = Method['_get']['_req']['Params'];
   type Response = Method['_get']['_res']['Union'];
   type Endpoint = Method['Endpoint'];
 
   router.get<Params, Response>(
-    validateEndpoint<Endpoint>('/communities/:requestId'),
+    validateEndpoint<Endpoint>('/communities/v1/:requestId'),
     async (req, res) => {
       const {
         params: { requestId },
@@ -20,11 +20,7 @@ const router = express.Router();
       } = req;
 
       try {
-        const communitiesList = req.user
-          ? await store.community.selectForCommunityFeedForUserId(user.id)
-          : await store.community.selectForCommunityFeedForVisitor();
-
-        console.log('communities list ', communitiesList);
+        const communitiesList = await store.communities.list(user.id);
 
         if (!communitiesList) {
           throw new Error();
@@ -32,7 +28,7 @@ const router = express.Router();
 
         res.json({
           id: requestId,
-          state: 'success' as 'success',
+          state: 'success',
           body: communitiesList,
         });
       } catch {
@@ -49,30 +45,25 @@ const router = express.Router();
 })();
 
 (() => {
-  type Method = CommunityEndpoint['_single']['_v1'];
+  type Method = CommunitySingle;
   type Params = Method['_get']['_req']['Params'];
   type Response = Method['_get']['_res']['Union'];
   type Endpoint = Method['Endpoint'];
 
   router.get<Params, Response>(
-    validateEndpoint<Endpoint>('/community/:communitySlug/:requestId'),
+    validateEndpoint<Endpoint>('/community/v1/:communitySlug/:requestId'),
     async ({ params: { requestId, communitySlug } }, res) => {
       try {
-        const communities = await store.community.selectForCommunityDetails(
-          communitySlug
-        );
+        const communitiesSingle = await store.communities.single(communitySlug);
 
-        console.log('communities', communities);
-        if (!communities.length) {
+        if (!communitiesSingle) {
           throw new Error('COMMUNITY_FETCH_ERROR');
         }
-
-        const community = communities[0];
 
         res.json({
           id: requestId,
           state: 'success',
-          body: community,
+          body: communitiesSingle,
         });
       } catch (e) {
         res.json({

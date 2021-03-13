@@ -1,46 +1,39 @@
+import type { CommentSave } from 'six__server__ep-types';
 import express from 'express';
 import store from 'six__server__store';
-import type { CommentEndpoint } from 'six__public-api';
 import { validateEndpoint } from '../helpers';
 
 const router = express.Router();
 
 (() => {
-  type Method = CommentEndpoint['_save']['_v1'];
+  type Method = CommentSave;
   type Params = Method['_post']['_req']['Params'];
   type Response = Method['_post']['_res']['Union'];
   type Endpoint = Method['Endpoint'];
   type Body = Method['_post']['_req']['Body'];
 
   router.post<Params, Response, Body>(
-    validateEndpoint<Endpoint>('/comment/save/:requestId'),
-    async (
-      { params: { requestId }, body: { parentId, body, userId, postId } },
-      res
-    ) => {
+    validateEndpoint<Endpoint>('/comment/save/v1/:requestId'),
+    async ({ params: { requestId }, body }, res) => {
       try {
-        const commentSave = await store.comment.insert({
-          body,
-          parentId,
-          userId,
-          postId,
-        });
+        const commentSave = await store.comments.save(body);
 
         if (!commentSave) {
-          throw new Error();
+          throw new Error('COMMENT_SAVE');
         }
 
         res.json({
           id: requestId,
-          state: 'success' as 'success',
+          state: 'success',
           body: commentSave,
         });
       } catch (e) {
+        console.error(e);
         res.json({
           id: requestId,
-          state: 'fail' as 'fail',
+          state: 'fail',
           errors: {
-            general: 'COMMENT_SAVE_FAIL',
+            general: 'COMMENT_SAVE_GENERAL',
           },
         });
       }
