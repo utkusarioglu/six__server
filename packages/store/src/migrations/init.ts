@@ -6,25 +6,25 @@ import type Store from '../index';
  */
 export async function initStore(store: typeof Store): Promise<void> {
   // entities
-  await store.user.createTable();
-  await store.comment.createTable();
-  await store.post.createTable();
-  await store.community.createTable();
-  await store.vote.createTable();
-  await store.userContent.createTable();
+  await store.models.user.createTable();
+  await store.models.comment.createTable();
+  await store.models.post.createTable();
+  await store.models.community.createTable();
+  await store.models.vote.createTable();
+  await store.models.userContent.createTable();
 
   // associations
-  await store.commentVote.createTable();
-  await store.communityPost.createTable();
-  await store.postComment.createTable();
-  await store.postVote.createTable();
-  await store.userComment.createTable();
-  await store.userCommunityCreator.createTable();
-  await store.userCommunitySubscription.createTable();
-  await store.userPost.createTable();
-  await store.userVote.createTable();
-  await store.visitorCommunitySubscription.createTable();
-  await store.postUserContent.createTable();
+  await store.models.commentVote.createTable();
+  await store.models.communityPost.createTable();
+  await store.models.postComment.createTable();
+  await store.models.postVote.createTable();
+  await store.models.userComment.createTable();
+  await store.models.userCommunityCreator.createTable();
+  await store.models.userCommunitySubscription.createTable();
+  await store.models.userPost.createTable();
+  await store.models.userVote.createTable();
+  await store.models.visitorCommunitySubscription.createTable();
+  await store.models.postUserContent.createTable();
 
   return;
 }
