@@ -11,6 +11,12 @@
     },
     {
       "path": "../../../public-api"
+    },
+    {
+      "path": "../ep-types"
+    },
+    {
+      "path": "../pl-types"
     }
   ]
 }
