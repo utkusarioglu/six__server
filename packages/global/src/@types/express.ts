@@ -1,4 +1,4 @@
-import type { SuccessfulUserLoginRes } from 'six__public-api';
+import type { UserLoginResSuccessful } from 'six__server__ep-types';
 
 /**
  * User properties that will be available to Express.user
@@ -6,7 +6,7 @@ import type { SuccessfulUserLoginRes } from 'six__public-api';
  * @todo
  * ! This type shall be derived from UserModel instead of being a standalone type
  */
-export type UserProps = SuccessfulUserLoginRes;
+export type UserProps = UserLoginResSuccessful;
 
 /**
  * Alter user type for express with the user properties for the app
