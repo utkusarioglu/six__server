@@ -1,3 +1,7 @@
+import type {
+  UserSignupIn,
+  UserSingupResponseErrors,
+} from 'six__server__ep-types';
 import {
   passwordLengthValid,
   passwordStrengthAcceptable,
@@ -5,12 +9,6 @@ import {
   isValidAge,
   usernameLengthValid,
 } from './single';
-import { UserEndpoint } from 'six__public-api';
-
-type UserEndpoint_singup_req_body = UserEndpoint['_signup']['_v1']['_post']['_req']['Body'];
-type UserEndpoint_singup_res_errors = Partial<
-  Record<keyof UserEndpoint_singup_req_body, string>
->;
 
 /**
  * validates the signup body parameters
@@ -21,8 +19,8 @@ export function validateSingupProps({
   password,
   email,
   age,
-}: UserEndpoint_singup_req_body): UserEndpoint_singup_res_errors {
-  const errors: UserEndpoint_singup_res_errors = {};
+}: UserSignupIn): UserSingupResponseErrors {
+  const errors: UserSingupResponseErrors = {};
 
   if (!usernameLengthValid(username)) {
     errors.username = 'USERNAME_LENGTH_ILLEGAL';
