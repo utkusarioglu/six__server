@@ -27,7 +27,7 @@ const router = express.Router();
       if (!user) {
         return res.json({
           id: requestId,
-          state: 'success' as 'success',
+          state: 'success',
           body: {
             state: 'visitor',
           },
@@ -38,7 +38,7 @@ const router = express.Router();
       // if there is a user session
       res.json({
         id: requestId,
-        state: 'success' as 'success',
+        state: 'success',
         body: {
           id,
           age,
@@ -139,7 +139,7 @@ const router = express.Router();
 
       res.json({
         id: requestId,
-        state: 'success' as 'success',
+        state: 'success',
         body: {
           state: 'visitor',
         },
@@ -176,7 +176,7 @@ const router = express.Router();
         });
       }
 
-      const user = await store.user.selectByEmail(email);
+      const user = await store.users.session(email);
 
       if (user !== false) {
         return res.json({
@@ -196,7 +196,7 @@ const router = express.Router();
         password: passwordHashed,
       };
 
-      await store.user._insert(userModel);
+      await store.users.signup(userModel);
 
       const userLogin = {
         ...body,

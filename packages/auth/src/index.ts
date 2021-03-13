@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { isValidEmail, passwordLengthValid } from './validation/single';
 import { SESSION_SECRET, SECURE_SCHEMES } from 'six__server__global';
 import type { Express, Request, Response, NextFunction } from 'express';
-import authRoutes from './auth-routes';
+import authRoutes from './auth.routes';
 
 const LocalStrategy = passportLocal.Strategy;
 
@@ -33,7 +33,7 @@ Passport.use(
         return done(errors);
       }
 
-      store.user.selectByEmail(email).then((user: Express.User | false) => {
+      store.users.session(email).then((user: Express.User | false | void) => {
         if (!user) {
           return done('NO_SUCH_USER', false);
         }
