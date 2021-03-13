@@ -1,16 +1,21 @@
+import type {
+  UserSession,
+  UserLogin,
+  UserLogout,
+  UserSignup,
+} from 'six__server__ep-types';
 import express from 'express';
 import store from 'six__server__store';
 import passport from 'passport';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import type { UserEndpoint } from 'six__public-api';
 import { validateEndpoint } from './helpers';
 import { validateSingupProps } from './validation/pack';
 
 const router = express.Router();
 
 (() => {
-  type Method = UserEndpoint['_session']['_v1'];
+  type Method = UserSession;
   type Params = Method['_get']['_req']['Params'];
   type Response = Method['_get']['_res']['Union'];
   type Endpoint = Method['Endpoint'];
@@ -47,7 +52,7 @@ const router = express.Router();
 })();
 
 (() => {
-  type Method = UserEndpoint['_login']['_v1'];
+  type Method = UserLogin;
   type Params = Method['_post']['_req']['Params'];
   type Response = Method['_post']['_res']['Union'];
   type Endpoint = Method['Endpoint'];
@@ -115,7 +120,7 @@ const router = express.Router();
 })();
 
 (() => {
-  type Method = UserEndpoint['_logout']['_v1'];
+  type Method = UserLogout;
   type Params = Method['_post']['_req']['Params'];
   type Response = Method['_post']['_res']['Union'];
   type Endpoint = Method['Endpoint'];
@@ -144,7 +149,7 @@ const router = express.Router();
 })();
 
 (() => {
-  type Method = UserEndpoint['_signup']['_v1'];
+  type Method = UserSignup;
   type Params = Method['_post']['_req']['Params'];
   type Response = Method['_post']['_res']['Union'];
   type Endpoint = Method['Endpoint'];
