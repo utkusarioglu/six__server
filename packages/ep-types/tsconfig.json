@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "composite": true,
+    "outDir": "lib"
+  },
+  "include": ["src", "../main/src/helpers/errors-out.ts"],
+  "references": [
+    {
+      "path": "../../../public-api"
+    }
+  ]
+}
