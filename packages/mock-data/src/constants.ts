@@ -1,11 +1,11 @@
-import { CommunityPipeline } from 'six__server__store/src/models/community/community.types';
-import type { PostPipeline } from 'six__server__store/src/models/post/post.types';
-import type { UserCommunitySubscriptionPipeline } from 'six__server__store/src/models/user-community-subscription/user-community-subscription.types';
-import type { VisitorCommunitySubscriptionPipeline } from 'six__server__store/src/models/visitor-community-subscription/visitor-community-subscription.types';
-import type { UserPipeline } from 'six__server__store/src/models/user/user.types';
-import { UserContentPipeline } from 'six__server__store/src/models/user-content/user-content.types';
+import { CommunityUpPl } from 'six__server__store/src/models/community/community.model.types';
+import type { PostUpPl } from 'six__server__store/src/models/post/post.model.types';
+import type { UserCommunitySubscriptionUpPl } from 'six__server__store/src/models/user-community-subscription/user-community-subscription.model.types';
+import type { VisitorCommunitySubscriptionUpPl } from 'six__server__store/src/models/visitor-community-subscription/visitor-community-subscription.model.types';
+import type { UserUpPl } from 'six__server__store/src/models/user/user.model.types';
+import { UserContentUpPl } from 'six__server__pl-types';
 
-export const USERS: (UserPipeline['_insert']['Out'] & {
+export const USERS: (UserUpPl['_insert']['Out'] & {
   id: string;
 })[] = [
   {
@@ -18,20 +18,20 @@ export const USERS: (UserPipeline['_insert']['Out'] & {
   {
     id: '6cfb8fe7-074e-4cd5-ba38-bf1cceaf0dd6',
     username: 'mr_bun',
-    password: '$2b$10$7O1nkhhxET9jgLY3FvAWseEgM5qELRtqeqlef051y3r9FD/XTwUZC',
+    password: '$2b$10$xMLpIKE0xPvIHmj2tCSAUuAaUFV.Ra9rtL1XWsF.6Q3fIACf0P.KS', // Mb8rx-rt4k7
     email: 'mrbun@gmail.com',
     age: 22,
   },
   {
     id: '15ffc829-6767-4dbe-86bb-b7303cba06a5',
     username: 'john_doe',
-    password: '$2b$10$7O1nkhhxET9jgLY3FvAWseEgM5qELRtqeqlef051y3r9FD/XTwUZC',
+    password: '$2b$10$xMLpIKE0xPvIHmj2tCSAUuAaUFV.Ra9rtL1XWsF.6Q3fIACf0P.KS', // Mb8rx-rt4k7
     email: 'john@doe.com',
     age: 56,
   },
 ];
 
-export const COMMUNITIES: (CommunityPipeline['_insert']['Out'] & {
+export const COMMUNITIES: (CommunityUpPl['_insert']['Out'] & {
   id: string;
 })[] = [
   {
@@ -55,7 +55,7 @@ export const COMMUNITIES: (CommunityPipeline['_insert']['Out'] & {
   },
 ];
 
-export const POSTS: PostPipeline['_store']['In'][] = [
+export const POSTS: PostUpPl['_router']['In'][] = [
   {
     title: "utku's first post",
     body: 'This is the body of my first post',
@@ -103,7 +103,7 @@ export const POSTS: PostPipeline['_store']['In'][] = [
   },
 ];
 
-export const VISITOR_COMMUNITIES: VisitorCommunitySubscriptionPipeline['_insert']['Out'][] = [
+export const VISITOR_COMMUNITIES: VisitorCommunitySubscriptionUpPl['_insert']['OutT'][] = [
   {
     community_id: '268944e3-55a3-4361-967c-c17f530a660b',
   },
@@ -112,14 +112,14 @@ export const VISITOR_COMMUNITIES: VisitorCommunitySubscriptionPipeline['_insert'
   },
 ];
 
-export const USER_COMMUNITY_SUBSCRIPTIONS: UserCommunitySubscriptionPipeline['_insert']['Out'][] = [
+export const USER_COMMUNITY_SUBSCRIPTIONS: UserCommunitySubscriptionUpPl['_insert']['OutT'][] = [
   {
     user_id: USERS[0].id!,
     community_id: COMMUNITIES[0].id!,
   },
 ];
 
-export const USER_CONTENTS: UserContentPipeline['_insert']['In'][] = [
+export const USER_CONTENTS: UserContentUpPl['_insert']['In'][] = [
   {
     filename: '1.jpg',
     type: 'image/jpg',

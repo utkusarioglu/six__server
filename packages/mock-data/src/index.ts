@@ -10,42 +10,46 @@ import {
 import { NODE_ENV } from 'six__server__global';
 
 async function mockUsers(): Promise<void> {
-  await store.user.deleteAll();
-  await store.user._insert(USERS);
+  await store.models.user.deleteAll();
+  await store.models.user._insert_old(USERS);
 }
 
 async function mockCommunities(): Promise<void> {
-  await store.community.deleteAll();
-  await store.community._insert(COMMUNITIES);
+  await store.models.community.deleteAll();
+  await store.models.community._insert_old(COMMUNITIES);
 
-  await store.visitorCommunitySubscription.deleteAll();
-  await store.visitorCommunitySubscription._insert(VISITOR_COMMUNITIES);
+  await store.models.visitorCommunitySubscription.deleteAll();
+  await store.models.visitorCommunitySubscription._insert_old(
+    VISITOR_COMMUNITIES
+  );
 
-  await store.userCommunitySubscription._insert(USER_COMMUNITY_SUBSCRIPTIONS);
+  await store.models.userCommunitySubscription._insert_old(
+    USER_COMMUNITY_SUBSCRIPTIONS
+  );
 }
 
 async function mockComments() {
-  await store.comment.deleteAll();
+  await store.models.comment.deleteAll();
 }
 
 async function mockVotes() {
-  await store.vote.deleteAll();
+  await store.models.vote.deleteAll();
 }
 
 async function mockUserContents() {
-  await store.userContent.deleteAll();
-  await store.userContent._insert(USER_CONTENTS);
+  await store.models.userContent.deleteAll();
+  await store.models.userContent._insert_old(USER_CONTENTS);
 }
 
 /**
  * Creates mock posts library
  */
 async function mockPosts(): Promise<void> {
-  // await store.post.deleteAll();
+  await store.models.post.deleteAll();
 
   await POSTS.reduce((chain, post) => {
     chain = chain.then(() => {
-      store.post.insert(post);
+      store.posts.create(post);
     });
     return chain;
   }, Promise.resolve());
@@ -60,10 +64,12 @@ async function mockPosts(): Promise<void> {
 export async function createMockData(): Promise<void> {
   if (NODE_ENV === 'test') return Promise.resolve();
   // await clearNaryAssociations();
+
   await mockUsers();
   await mockUserContents();
   await mockCommunities();
   await mockVotes();
   await mockPosts();
+
   // await mockComments();
 }
