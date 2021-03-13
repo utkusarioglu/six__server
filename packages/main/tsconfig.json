@@ -11,9 +11,6 @@
       "path": "../global"
     },
     {
-      "path": "../../../public-api"
-    },
-    {
       "path": "../store/"
     },
     {
@@ -21,6 +18,9 @@
     },
     {
       "path": "../mock-data"
+    },
+    {
+      "path": "../ep-types"
     }
   ]
 }
