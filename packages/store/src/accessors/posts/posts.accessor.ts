@@ -40,7 +40,7 @@ export class PostsAccess {
     userId,
   }: PostCreateIn): Promise<void | PostCreateOut> {
     try {
-      return postgres.transaction(async (transaction) => {
+      const postId = await postgres.transaction(async (transaction) => {
         const postInsertRows = await post.insert({ title, body }, transaction);
         if (!postInsertRows) {
           throw new Error(ERRORS.POST_INSERT);
@@ -95,8 +95,13 @@ export class PostsAccess {
           0,
           transaction
         );
+
+        return postId;
       });
+
+      return post.selectPostByIdForLoggedIn(userId, postId);
     } catch (e) {
+      console.error(e);
       return Promise.resolve();
     }
   }
