@@ -20,7 +20,7 @@ const router = express.Router();
       } = req;
 
       try {
-        const communitiesList = await store.communities.list(user.id);
+        const communitiesList = await store.communities.list(user && user.id);
 
         if (!communitiesList) {
           throw new Error();
@@ -31,7 +31,8 @@ const router = express.Router();
           state: 'success',
           body: communitiesList,
         });
-      } catch {
+      } catch (e) {
+        console.error(e);
         res.json({
           id: requestId,
           state: 'fail',
