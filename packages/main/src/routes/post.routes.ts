@@ -157,7 +157,7 @@ const router = express.Router();
   type Body = Method['_post']['_req']['Body'];
 
   router.post<Params, Response, Body>(
-    validateEndpoint<Endpoint>('/post/v1/:requestId'),
+    validateEndpoint<Endpoint>('/post/create/v1/:requestId'),
     async ({ params: { requestId }, body }, res) => {
       try {
         const postCreate = await store.posts.create(body);
