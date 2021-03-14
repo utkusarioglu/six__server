@@ -58,7 +58,7 @@ export class PostStore extends Model<PostUpPl> {
         WHEN vs.vote_type IS NOT NULL THEN vs.vote_type
         ELSE 0
       END
-      `.replace(/\s\s+/g, ' ')
+      `.replace(/\s{2,}/g, ' ')
     ),
   };
 

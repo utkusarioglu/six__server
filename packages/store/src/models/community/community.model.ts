@@ -79,7 +79,7 @@ export class CommunityStore extends Model<CommunityUpPl> {
           THEN TRUE 
           ELSE FALSE 
         END
-        `
+        `.replace(/\s{2,}/g, ' ')
       ),
     };
 
