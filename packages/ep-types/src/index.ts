@@ -18,7 +18,7 @@ export type PostVote = PostEp['_vote']['_v1'];
 export type PostVoteIn = PostVote['_post']['_req']['Body'];
 export type PostVoteOut = PostVote['_post']['_res']['Success']['body'];
 
-type PostCreate = PostEp['_create']['_v1'];
+export type PostCreate = PostEp['_create']['_v1'];
 export type PostCreateIn = PostCreate['_post']['_req']['Body'];
 export type PostCreateOut = PostCreate['_post']['_res']['Success']['body'];
 

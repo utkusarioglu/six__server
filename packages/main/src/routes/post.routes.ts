@@ -3,6 +3,7 @@ import type {
   PostComments,
   PostDetails,
   PostVote,
+  PostCreate,
 } from 'six__server__ep-types';
 import express from 'express';
 import store from 'six__server__store';
@@ -141,6 +142,42 @@ const router = express.Router();
           state: 'fail',
           errors: {
             general: 'POST_VOTE_GENERAL',
+          },
+        });
+      }
+    }
+  );
+})();
+
+(() => {
+  type Method = PostCreate;
+  type Params = Method['_post']['_req']['Params'];
+  type Response = Method['_post']['_res']['Union'];
+  type Endpoint = Method['Endpoint'];
+  type Body = Method['_post']['_req']['Body'];
+
+  router.post<Params, Response, Body>(
+    validateEndpoint<Endpoint>('/post/v1/:requestId'),
+    async ({ params: { requestId }, body }, res) => {
+      try {
+        const postCreate = await store.posts.create(body);
+
+        if (!postCreate) {
+          throw new Error('POST_CREATE');
+        }
+
+        res.json({
+          id: requestId,
+          state: 'success',
+          body: postCreate,
+        });
+      } catch (e) {
+        console.error(e);
+        res.json({
+          id: requestId,
+          state: 'fail',
+          errors: {
+            general: 'POST_CREATE',
           },
         });
       }
