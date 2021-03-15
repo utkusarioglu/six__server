@@ -46,7 +46,7 @@ export class CommentsAccess {
           throw new Error(ERRORS.USER_COMMENT_INSERT);
         }
 
-        const postUpdateRows = await post.incrementCommentCountByPostId(
+        const postUpdateRows = await post.incrementPostCommentCountByPostId(
           postId,
           1
         );

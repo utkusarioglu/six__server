@@ -105,7 +105,7 @@ export class PostStore extends Model<PostUpPl> {
     });
   }
 
-  async incrementCommentCountByPostId(
+  async incrementPostCommentCountByPostId(
     postId: uuid,
     commentCountIncrement: number
   ) {
@@ -115,7 +115,7 @@ export class PostStore extends Model<PostUpPl> {
       .catch(this._errorHandler);
   }
 
-  async selectPostFeedPostsForLoggedIn(
+  async selectPostFeedPostsByUserId(
     userId: string
   ): Promise<PostListOut | void> {
     return this._queryBuilder((table) => {
@@ -137,7 +137,7 @@ export class PostStore extends Model<PostUpPl> {
     });
   }
 
-  async selectPostByIdForLoggedIn(
+  async selectPostDetailsByPostIdAndUserId(
     userId: uuid,
     postId: uuid
   ): Promise<void | PostDetailsOut> {
@@ -146,20 +146,23 @@ export class PostStore extends Model<PostUpPl> {
         .first(this._user_post_columns)
         .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
         .join({ c: 'communities' }, 'c.id', 'cp.community_id')
-        .join(
+        .join({ up: 'user_posts' }, 'up.post_id', 'posts.id')
+        .join({ u: 'users' }, 'u.id', 'up.user_id')
+        .leftJoin(
           { ucs: 'user_community_subscriptions' },
           'ucs.community_id',
           'c.id'
         )
-        .join({ up: 'user_posts' }, 'up.post_id', 'posts.id')
-        .join({ u: 'users' }, 'u.id', 'up.user_id')
         .leftJoin(this.userContentsSubquery, 'suc.post_id', 'posts.id')
         .leftJoin(this.userVoteSubquery(userId), 'vs.pv_post_id', 'posts.id')
-        .where({ 'ucs.user_id': userId, 'posts.id': postId });
+        .where({
+          // 'ucs.user_id': userId,
+          'posts.id': postId,
+        });
     });
   }
 
-  async selectPostBySlugAndUserId(
+  async selectPostDetailsBySlugAndUserId(
     userId: uuid,
     postSlug: string
   ): Promise<void | PostDetailsOut> {
@@ -168,23 +171,26 @@ export class PostStore extends Model<PostUpPl> {
         .first(this._user_post_columns)
         .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
         .join({ c: 'communities' }, 'c.id', 'cp.community_id')
-        .join(
+        .join({ up: 'user_posts' }, 'up.post_id', 'posts.id')
+        .join({ u: 'users' }, 'u.id', 'up.user_id')
+        .leftJoin(
           { ucs: 'user_community_subscriptions' },
           'ucs.community_id',
           'c.id'
         )
-        .join({ up: 'user_posts' }, 'up.post_id', 'posts.id')
-        .join({ u: 'users' }, 'u.id', 'up.user_id')
         .leftJoin(this.userContentsSubquery, 'suc.post_id', 'posts.id')
         .leftJoin(this.userVoteSubquery(userId), 'vs.pv_post_id', 'posts.id')
-        .where({ 'ucs.user_id': userId, 'posts.slug': postSlug });
+        .where({
+          // 'ucs.user_id': userId,
+          'posts.slug': postSlug,
+        });
     });
   }
 
   /**
    * Selects the posts that the visitors see
    */
-  async selectVisitorPosts(): Promise<PostListOut | void> {
+  async selectVisitorPostFeed(): Promise<PostListOut | void> {
     return this._queryBuilder((table) => {
       return table
         .join({ up: 'user_posts' }, 'posts.id', 'up.post_id')
@@ -206,7 +212,7 @@ export class PostStore extends Model<PostUpPl> {
    *
    * @param postSlug slug for the post to be returned
    */
-  async selectVisitorPostBySlug(
+  async selectVisitorPostDetailsBySlug(
     postSlug: PostSlug
   ): Promise<PostDetailsOut | void> {
     return this._queryBuilder((table) => {
@@ -249,7 +255,7 @@ export class PostStore extends Model<PostUpPl> {
    * @param transaction knex transaction object
    * @param rollback rollback function in case the transaction fails
    */
-  async updatePostVote(
+  async updatePostVoteByPostId(
     postId: string,
     likeIncrement: number,
     dislikeIncrement: number,

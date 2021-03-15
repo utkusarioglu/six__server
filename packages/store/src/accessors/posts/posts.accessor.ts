@@ -27,14 +27,14 @@ export class PostsAccess {
     postSlug: string
   ): Promise<void | PostDetailsOut> {
     return userId
-      ? post.selectPostBySlugAndUserId(userId, postSlug)
-      : post.selectVisitorPostBySlug(postSlug);
+      ? post.selectPostDetailsBySlugAndUserId(userId, postSlug)
+      : post.selectVisitorPostDetailsBySlug(postSlug);
   }
 
   async feed(userId?: uuid): Promise<void | PostListOut> {
     return userId
-      ? await post.selectPostFeedPostsForLoggedIn(userId)
-      : await post.selectVisitorPosts();
+      ? await post.selectPostFeedPostsByUserId(userId)
+      : await post.selectVisitorPostFeed();
   }
 
   async create({
@@ -104,7 +104,7 @@ export class PostsAccess {
         return postId;
       });
 
-      return post.selectPostByIdForLoggedIn(userId, postId);
+      return post.selectPostDetailsByPostIdAndUserId(userId, postId);
     } catch (e) {
       console.error(e);
       return Promise.resolve();
@@ -129,7 +129,10 @@ export class PostsAccess {
       );
     }
 
-    const finalPost = await post.selectPostByIdForLoggedIn(userId, postId);
+    const finalPost = await post.selectPostDetailsByPostIdAndUserId(
+      userId,
+      postId
+    );
 
     if (!finalPost) {
       throw new Error(ERRORS.POST_SELECT);
@@ -152,7 +155,7 @@ export class PostsAccess {
     return postgres.transaction(async (transaction) => {
       await vote.deleteById(existing.voteId, transaction);
 
-      await post.updatePostVote(
+      await post.updatePostVoteByPostId(
         postId,
         existing.voteType === 1 ? -1 : 0,
         existing.voteType === -1 ? -1 : 0,
@@ -215,7 +218,7 @@ export class PostsAccess {
         throw new Error(ERRORS.USER_VOTE);
       }
 
-      const postUpdate = await post.updatePostVote(
+      const postUpdate = await post.updatePostVoteByPostId(
         input.postId,
         likeIncrement,
         dislikeIncrement,

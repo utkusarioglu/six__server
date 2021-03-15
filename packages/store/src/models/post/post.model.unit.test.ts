@@ -97,7 +97,7 @@ describe(`
     });
 
     await post.createTable();
-    await post.selectPostFeedPostsForLoggedIn('user-id');
+    await post.selectPostFeedPostsByUserId('user-id');
     expect(queryHit).toBe(1);
 
     done();
@@ -127,7 +127,7 @@ describe(`
     });
 
     await post.createTable();
-    await post.selectVisitorPosts();
+    await post.selectVisitorPostFeed();
     expect(queryHit).toBe(1);
 
     done();
@@ -157,7 +157,7 @@ describe(`
     });
 
     await post.createTable();
-    await post.selectVisitorPostBySlug('some random id');
+    await post.selectVisitorPostDetailsBySlug('some random id');
     expect(queryHit).toBe(1);
 
     done();
