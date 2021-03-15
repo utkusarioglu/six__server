@@ -88,9 +88,12 @@ const router = express.Router();
 
   router.get<Params, Response>(
     validateEndpoint<Endpoint>('/post/slug/v1/:postSlug/:requestId'),
-    async ({ params: { postSlug, requestId } }, res) => {
+    async ({ params: { postSlug, requestId }, user }, res) => {
       try {
-        const post = await store.posts.singleByPostSlug(postSlug);
+        const post = await store.posts.singleByPostSlug(
+          user && user.id,
+          postSlug
+        );
 
         if (!post) {
           throw new Error();
@@ -102,6 +105,7 @@ const router = express.Router();
           body: post,
         });
       } catch (e) {
+        console.error(e);
         return res.json({
           id: requestId,
           state: 'fail',

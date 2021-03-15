@@ -159,6 +159,28 @@ export class PostStore extends Model<PostUpPl> {
     });
   }
 
+  async selectPostBySlugAndUserId(
+    userId: uuid,
+    postSlug: string
+  ): Promise<void | PostDetailsOut> {
+    return this._queryBuilder((table) => {
+      return table
+        .first(this._user_post_columns)
+        .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
+        .join({ c: 'communities' }, 'c.id', 'cp.community_id')
+        .join(
+          { ucs: 'user_community_subscriptions' },
+          'ucs.community_id',
+          'c.id'
+        )
+        .join({ up: 'user_posts' }, 'up.post_id', 'posts.id')
+        .join({ u: 'users' }, 'u.id', 'up.user_id')
+        .leftJoin(this.userContentsSubquery, 'suc.post_id', 'posts.id')
+        .leftJoin(this.userVoteSubquery(userId), 'vs.pv_post_id', 'posts.id')
+        .where({ 'ucs.user_id': userId, 'posts.slug': postSlug });
+    });
+  }
+
   /**
    * Selects the posts that the visitors see
    */

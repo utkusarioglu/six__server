@@ -22,8 +22,13 @@ import ERRORS from '../../errors';
 import communityPost from '../../models/community-post/community-post.model';
 
 export class PostsAccess {
-  async singleByPostSlug(postSlug: string): Promise<void | PostDetailsOut> {
-    return post.selectVisitorPostBySlug(postSlug);
+  async singleByPostSlug(
+    userId: uuid,
+    postSlug: string
+  ): Promise<void | PostDetailsOut> {
+    return userId
+      ? post.selectPostBySlugAndUserId(userId, postSlug)
+      : post.selectVisitorPostBySlug(postSlug);
   }
 
   async feed(userId?: uuid): Promise<void | PostListOut> {
@@ -112,15 +117,11 @@ export class PostsAccess {
     postId,
   }: PostVoteIn): Promise<void | PostVoteOut> {
     const existing = await vote.selectPostVotesForUserId(postId, userId);
-
-    console.log('existing\n', existing);
-
     if (!!existing) {
       await this.deleteVote(existing, voteType, userId, postId);
     }
 
     if (!existing || existing.voteType !== voteType) {
-      console.log('creating new vote');
       await this.createNewVote(
         { voteType, userId, postId },
         voteType === 1 ? 1 : 0,
