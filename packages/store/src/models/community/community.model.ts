@@ -114,11 +114,11 @@ export class CommunityStore extends Model<CommunityUpPl> {
       ucs: this._raw(
         `
         CASE 
-          WHEN s.ucs_community_id IS NOT NULL 
+          WHEN ucs.community_id IS NOT NULL 
           THEN TRUE 
           ELSE FALSE 
         END
-        `
+        `.replace(/\s{2,}/g, ' ')
       ),
     };
 

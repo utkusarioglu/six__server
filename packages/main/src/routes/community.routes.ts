@@ -67,6 +67,7 @@ const router = express.Router();
           body: communitiesSingle,
         });
       } catch (e) {
+        console.error(e);
         res.json({
           id: requestId,
           state: 'fail',
