@@ -16,7 +16,7 @@ const router = express.Router();
   type Endpoint = Method['Endpoint'];
 
   router.get<Params, Response>(
-    validateEndpoint<Endpoint>('/communities/v1/:requestId'),
+    validateEndpoint<Endpoint>('/community/list/v1/:requestId'),
     async (req, res) => {
       const {
         params: { requestId },
