@@ -1,4 +1,10 @@
-import type { UserCommunityCreatorUpPl } from './user-community-creator.model.types';
+import type {
+  UserCommunityCreatorUpPl,
+  UccPrepareInsertIn,
+  UccPrepareInsertOut,
+  UccInsertOut,
+} from './user-community-creator.model.types';
+import type { Transaction } from 'knex';
 import postgres from '../../connectors/postgres';
 import { Model } from '../../helpers/model/model';
 
@@ -28,6 +34,22 @@ export class UserCommunityCreatorStore extends Model<UserCommunityCreatorUpPl> {
         .onDelete('CASCADE')
         .onUpdate('CASCADE');
     });
+  }
+
+  async insert(
+    input: UccPrepareInsertIn,
+    transaction: Transaction,
+    rollback?: () => void
+  ): Promise<void | UccInsertOut> {
+    const prepare = ({
+      communityId,
+      userId,
+    }: UccPrepareInsertIn): UccPrepareInsertOut => ({
+      community_id: communityId,
+      user_id: userId,
+    });
+
+    return this._insert(input, prepare, ['id'], transaction, rollback);
   }
 }
 
