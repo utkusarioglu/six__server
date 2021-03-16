@@ -33,8 +33,17 @@ export class PostsAccess {
 
   async feed(userId?: uuid): Promise<void | PostListOut> {
     return userId
-      ? await post.selectPostFeedPostsByUserId(userId)
+      ? await post.selectPostFeedByUserId(userId)
       : await post.selectVisitorPostFeed();
+  }
+
+  async communityFeed(
+    communitySlug: string,
+    userId?: uuid
+  ): Promise<void | PostListOut> {
+    return userId
+      ? await post.selectPostFeedByUserIdAndCommunitySlug(userId, communitySlug)
+      : await post.selectVisitorPostFeedByCommunitySlug(communitySlug);
   }
 
   async create({
