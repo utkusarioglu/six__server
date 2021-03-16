@@ -1,7 +1,11 @@
 import type {
   CommunityUpPl,
   SelectForCommunityFeedColumns,
+  CommunityCreatePrepareIn,
+  CommunityCreatePrepareOut,
+  CommunityInsertOut,
 } from './community.model.types';
+import type { Transaction } from 'knex';
 import postgres from '../../connectors/postgres';
 import { Model } from '../../helpers/model/model';
 
@@ -132,6 +136,18 @@ export class CommunityStore extends Model<CommunityUpPl> {
         )
         .where({ slug });
     });
+  }
+
+  async insert(
+    input: CommunityCreatePrepareIn,
+    transaction: Transaction,
+    rollback?: () => void
+  ): Promise<void | CommunityInsertOut> {
+    const prepare = (
+      input: CommunityCreatePrepareIn
+    ): CommunityCreatePrepareOut => input;
+
+    return this._insert(input, prepare, ['id'], transaction, rollback);
   }
 }
 
