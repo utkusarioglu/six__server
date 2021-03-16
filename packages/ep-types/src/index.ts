@@ -54,6 +54,9 @@ export type CommunityCreate = CommunityEp['_create']['_v1'];
 export type CommunityCreateIn = CommunityCreate['_post']['_req']['Body'];
 export type CommunityCreateOut = CommunityCreate['_post']['_res']['Success']['body'];
 
+export type CommunityPosts = CommunityEp['_community_posts']['_v1'];
+export type CommunityPostsOut = CommunityPosts['_get']['_res']['Success']['body'];
+
 /**
  * Vote
  */
