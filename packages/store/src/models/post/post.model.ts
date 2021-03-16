@@ -115,28 +115,6 @@ export class PostStore extends Model<PostUpPl> {
       .catch(this._errorHandler);
   }
 
-  async selectPostFeedPostsByUserId(
-    userId: string
-  ): Promise<PostListOut | void> {
-    return this._queryBuilder((table) => {
-      const query = table
-        .select(this._user_post_columns)
-        .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
-        .join({ c: 'communities' }, 'c.id', 'cp.community_id')
-        .join(
-          { ucs: 'user_community_subscriptions' },
-          'ucs.community_id',
-          'c.id'
-        )
-        .join({ up: 'user_posts' }, 'up.post_id', 'posts.id')
-        .join({ u: 'users' }, 'u.id', 'up.user_id')
-        .leftJoin(this.userContentsSubquery, 'suc.post_id', 'posts.id')
-        .leftJoin(this.userVoteSubquery(userId), 'vs.pv_post_id', 'posts.id')
-        .where({ 'ucs.user_id': userId });
-      return query;
-    });
-  }
-
   async selectPostDetailsByPostIdAndUserId(
     userId: uuid,
     postId: uuid
@@ -193,6 +171,7 @@ export class PostStore extends Model<PostUpPl> {
   async selectVisitorPostFeed(): Promise<PostListOut | void> {
     return this._queryBuilder((table) => {
       return table
+        .select(this._visitor_post_columns)
         .join({ up: 'user_posts' }, 'posts.id', 'up.post_id')
         .join({ u: 'users' }, 'u.id', 'up.user_id')
         .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
@@ -202,8 +181,68 @@ export class PostStore extends Model<PostUpPl> {
           'vcs.community_id',
           'c.id'
         )
+        .leftJoin(this.userContentsSubquery, 'suc.post_id', 'posts.id');
+    });
+  }
+
+  async selectVisitorPostFeedByCommunitySlug(
+    communitySlug: string
+  ): Promise<PostListOut | void> {
+    return this._queryBuilder((table) => {
+      return table
+        .select(this._visitor_post_columns)
+        .join({ up: 'user_posts' }, 'posts.id', 'up.post_id')
+        .join({ u: 'users' }, 'u.id', 'up.user_id')
+        .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
+        .join({ c: 'communities' }, 'c.id', 'cp.community_id')
         .leftJoin(this.userContentsSubquery, 'suc.post_id', 'posts.id')
-        .select(this._visitor_post_columns);
+        .where({ 'c.slug': communitySlug });
+    });
+  }
+
+  async selectPostFeedByUserId(userId: string): Promise<PostListOut | void> {
+    return this._queryBuilder((table) => {
+      const query = table
+        .select(this._user_post_columns)
+        .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
+        .join({ c: 'communities' }, 'c.id', 'cp.community_id')
+        .join(
+          { ucs: 'user_community_subscriptions' },
+          'ucs.community_id',
+          'c.id'
+        )
+        .join({ up: 'user_posts' }, 'up.post_id', 'posts.id')
+        .join({ u: 'users' }, 'u.id', 'up.user_id')
+        .leftJoin(this.userContentsSubquery, 'suc.post_id', 'posts.id')
+        .leftJoin(this.userVoteSubquery(userId), 'vs.pv_post_id', 'posts.id')
+        .where({ 'ucs.user_id': userId });
+      return query;
+    });
+  }
+
+  async selectPostFeedByUserIdAndCommunitySlug(
+    userId: string,
+    communitySlug: string
+  ): Promise<PostListOut | void> {
+    return this._queryBuilder((table) => {
+      const query = table
+        .select(this._user_post_columns)
+        .join({ cp: 'community_posts' }, 'cp.post_id', 'posts.id')
+        .join({ c: 'communities' }, 'c.id', 'cp.community_id')
+        .join({ up: 'user_posts' }, 'up.post_id', 'posts.id')
+        .join({ u: 'users' }, 'u.id', 'up.user_id')
+        .leftJoin(
+          { ucs: 'user_community_subscriptions' },
+          'ucs.community_id',
+          'c.id'
+        )
+        .leftJoin(this.userContentsSubquery, 'suc.post_id', 'posts.id')
+        .leftJoin(this.userVoteSubquery(userId), 'vs.pv_post_id', 'posts.id')
+        .where({
+          // 'ucs.user_id': userId,
+          'c.slug': communitySlug,
+        });
+      return query;
     });
   }
 
