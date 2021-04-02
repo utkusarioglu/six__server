@@ -8,7 +8,7 @@
   "include": ["src", "../main/src/helpers/errors-out.ts"],
   "references": [
     {
-      "path": "../../../public-api"
+      "path": "../../../six__public-api"
     }
   ]
 }
