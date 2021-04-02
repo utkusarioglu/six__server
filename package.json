@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@types/node": "^14.14.16",
-    "dotenv": "^8.2.0", 
+    "dotenv": "^8.2.0",
     "jest": "^26.6.3",
     "nodemon": "^2.0.6",
     "npm-run-all": "^4.1.5",
@@ -27,6 +27,7 @@
     "test": "docker exec -it six__server bash -c 'NODE_ENV=test $(yarn bin)/jest --watch'",
     "test:inside-container": "$(yarn bin)/jest",
     "test:ci": "$(yarn bin)/jest test --coverage --no-watchman a",
-    "bash": "docker exec -it six__server bash"
+    "bash": "docker exec -it six__server bash",
+    "bootstrap": "yarn && $(yarn bin)//lerna bootstrap"
   }
 }
