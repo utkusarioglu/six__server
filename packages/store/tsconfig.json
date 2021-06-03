@@ -10,7 +10,7 @@
       "path": "../auth"
     },
     {
-      "path": "../../../public-api"
+      "path": "../../../six__public-api"
     },
     {
       "path": "../ep-types"
